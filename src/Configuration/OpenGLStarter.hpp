@@ -5,14 +5,21 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#include <functional>
+
 #include "OpenGLConfig.hpp"
 
 struct OpenGLStarter{
     OpenGLConfig openGLConfig;
     int keyStatus[256];
+    static OpenGLStarter* instance;
 
     OpenGLStarter(const OpenGLConfig &config){
         this->openGLConfig = OpenGLConfig(config);
+    }
+
+    static void setInstance(OpenGLStarter* openGLStarter){
+        instance = openGLStarter;
     }
 
     void ResetKeyStatus(){
@@ -20,6 +27,11 @@ struct OpenGLStarter{
         //Initialize keyStatus
         for(i = 0; i < 256; i++)
             keyStatus[i] = 0; 
+    }
+
+    static void keyup(unsigned char key, int x, int y){
+        instance->keyStatus[(int)(key)] = 0;
+        glutPostRedisplay();
     }
 
     void initGlut(int argc, char *argv[]){
@@ -31,6 +43,8 @@ struct OpenGLStarter{
         glutInitWindowSize(openGLConfig.width, openGLConfig.height);
         glutInitWindowPosition(150,50);
         glutCreateWindow(openGLConfig.windowName.c_str());
+
+        glutKeyboardUpFunc(keyup);
 
     }
 
@@ -53,5 +67,7 @@ struct OpenGLStarter{
         
     }
 };
+
+OpenGLStarter* OpenGLStarter::instance = nullptr;
 
 #endif
