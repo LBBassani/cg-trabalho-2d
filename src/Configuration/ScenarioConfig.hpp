@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../Domain/SceneTree.hpp"
+#include "../Domain/Character.hpp"
 #include "../Third-Party-Libs/rapidxml-1.13/rapidxml.hpp"
 
 struct ParserSVG{
@@ -21,7 +22,7 @@ struct ParserSVG{
         rapidxml::xml_document<> doc;
         rapidxml::xml_node<> * root_node = NULL;
 
-        std::ifstream theFile ("../scenario/arena_teste.svg");
+        std::ifstream theFile (svgFileName);
         std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
         buffer.push_back('\0');
 
@@ -51,24 +52,42 @@ struct ParserSVG{
 
                     bigger_width_than_height ? zoom_factor = 500/height : 500/width;
                     x_0 = x + width/2;
-                    std::cout << x_0 << std::endl;
                     y_0 = -y - height/2;
                     x_offset = 500/zoom_factor;
                     y_offset = 500/zoom_factor;
 
                 }
 
-                //std::cout << "Inicializando um " << colorName << " " << nodeName << " de " << width << "x" << height << " na posição (" << x << ", " << y << ")" << std::endl;
                 Entity* newBackgroundModel = new Entity();
                 bigger_width_than_height ? newBackgroundModel->setShape(new Rect(width, height)) : newBackgroundModel->setShape(new Rect(height, width));
                 newBackgroundModel->setHitbox(newBackgroundModel->getShape());
                 newBackgroundModel->setColor(getColorCode(colorName));
                 newBackgroundModel->transform.position.x = x - x_0 + width/2;
                 newBackgroundModel->transform.position.y = -y - y_0 - height;
+                newBackgroundModel->setNome("Rect");
                 //newBackgroundModel->transform.scale.x = zoom_factor;
                 //newBackgroundModel->transform.scale.y = zoom_factor;
                 
                 background->addChild(newBackgroundModel);
+            } else if (nodeName == "circle"){
+
+                float   r = atof(shape_node->first_attribute("r")->value()),
+                        x = atof(shape_node->first_attribute("cx")->value()),
+                        y = atof(shape_node->first_attribute("cy")->value());
+
+                Character* character = nullptr;
+                if(colorName == "green"){
+                    character = new Player();
+                } else{
+                    character = new Enemy();
+                }
+
+                character->setHitbox(new Rect(r, r));
+                character->transform.position.x = x - x_0 + r/2;
+                character->transform.position.y = -y - y_0 - r;
+                character->setNome("Character");
+
+                background->addChild(character);
             }
         }
 

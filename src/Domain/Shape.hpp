@@ -6,7 +6,7 @@
 
 struct Shape{
 
-    virtual void draw() { std::cout << "Desenhando Shape"; };
+    virtual void draw() = 0;
 
 };
 
@@ -23,8 +23,6 @@ struct Rect : public Shape{
      * @brief Desenha um retangulo no ponto (0,0) do sistema
      */
     virtual void draw(){
-        Shape::draw();
-        std::cout << " Rect de " << width << "x" << height << std::endl;
         glBegin(GL_POLYGON);    // Começa o desenho do retangulo
 
             glVertex2f(-width/2, 0); 		// Ponto inferior esquerdo
@@ -49,7 +47,6 @@ struct Circ : public Shape{
      * @brief Desenha um circulo no ponto (0,0) do sistema
      */
     virtual void draw(){
-        Shape::draw();
         glBegin(GL_POLYGON);    // Começa o desenho do circulo
 
             for(int i = 0; i < 360; i += 20){
