@@ -77,14 +77,14 @@ struct ParserSVG{
 
                 Character* character = nullptr;
                 if(colorName == "green"){
-                    character = new Player();
+                    character = new Player(r*2);
                 } else{
-                    character = new Enemy();
+                    character = new Enemy(r*2);
                 }
 
                 character->setHitbox(new Rect(r, r));
                 character->transform.position.x = x - x_0 + r/2;
-                character->transform.position.y = -y - y_0 - r;
+                character->transform.position.y = -y - y_0;
                 character->setNome("Character");
 
                 background->addChild(character);
