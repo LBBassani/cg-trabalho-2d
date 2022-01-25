@@ -1,8 +1,8 @@
 #if !defined TRANSFORM
 #define TRANSFORM
 
-#include "Third-Party-Libs/glm/glm.hpp"
-#include "Third-Party-Libs/glm/gtc/matrix_transform.hpp"
+#include "../Third-Party-Libs/glm/glm.hpp"
+#include "../Third-Party-Libs/glm/gtc/matrix_transform.hpp"
 
 struct Transform
 {
