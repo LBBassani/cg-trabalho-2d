@@ -31,7 +31,7 @@ struct ParserSVG{
         root_node = doc.first_node("svg");
 
         bool bigger_width_than_height = true;
-        float zoom_factor, x_0, y_0, x_offset, y_offset;
+        float zoom_factor, x_0, y_0, x_offset, y_offset, background_width, background_height;
 
         for(auto shape_node = root_node->first_node(); shape_node; shape_node = shape_node->next_sibling()){
             // Atributos de forma e cor
@@ -51,10 +51,11 @@ struct ParserSVG{
                     width > height ? bigger_width_than_height = true : bigger_width_than_height = false;
 
                     bigger_width_than_height ? zoom_factor = 500/height : 500/width;
-                    x_0 = x + width/2;
-                    y_0 = -y - height/2;
-                    x_offset = 500/zoom_factor;
-                    y_offset = 500/zoom_factor;
+
+                    background_width = width;
+                    background_height = height;
+                    x_0 = x + background_width/2;
+                    y_0 = -y - background_height/2;
 
                 }
 
@@ -65,8 +66,6 @@ struct ParserSVG{
                 newBackgroundModel->transform.position.x = x - x_0 + width/2;
                 newBackgroundModel->transform.position.y = -y - y_0 - height;
                 newBackgroundModel->setNome("Rect");
-                //newBackgroundModel->transform.scale.x = zoom_factor;
-                //newBackgroundModel->transform.scale.y = zoom_factor;
                 
                 background->addChild(newBackgroundModel);
             } else if (nodeName == "circle"){
@@ -82,7 +81,7 @@ struct ParserSVG{
                     character = new Enemy(r*2);
                 }
 
-                character->setHitbox(new Rect(r, r));
+                character->setHitbox(new Rect(r*2, r*2));
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
                 character->setNome("Character");
@@ -92,7 +91,11 @@ struct ParserSVG{
         }
 
         entity->addChild(background);
-        
+
+        // Configura zoom da tela
+        entity->transform.scale.x = zoom_factor;
+        entity->transform.scale.y = zoom_factor;
+            
         return entity;
     }
 
