@@ -14,7 +14,7 @@ struct ParserSVG{
 
     static Entity* parseSVG(std::string &svgFileName) {
 
-        Entity* entity = new Entity();
+        Entity* scene_root = new Entity();
 
         Entity* background = new Entity();
         background->setNome("background");
@@ -90,13 +90,13 @@ struct ParserSVG{
             }
         }
 
-        entity->addChild(background);
+        scene_root->addChild(background);
 
         // Configura zoom da tela
-        entity->transform.scale.x = zoom_factor;
-        entity->transform.scale.y = zoom_factor;
+        scene_root->transform.scale.x = zoom_factor;
+        scene_root->transform.scale.y = zoom_factor;
             
-        return entity;
+        return scene_root;
     }
 
     static glm::vec3 getColorCode(std::string colorName){
