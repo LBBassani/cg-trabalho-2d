@@ -8,10 +8,12 @@
 #include <functional>
 
 #include "OpenGLConfig.hpp"
+#include "../Domain/SceneTree.hpp"
 
 struct OpenGLStarter{
     OpenGLConfig openGLConfig;
     int keyStatus[256];
+    SceneTree sceneTree;
     static OpenGLStarter* instance;
 
     OpenGLStarter(const OpenGLConfig &config){
@@ -34,6 +36,14 @@ struct OpenGLStarter{
         glutPostRedisplay();
     }
 
+    static void renderScene(void){
+        glClear(GL_COLOR_BUFFER_BIT); // Limpa tela
+
+        instance->sceneTree.draw(); // Desenha cena no buffer
+
+        glutSwapBuffers(); // Desenha a cena do buffer na tela
+    }
+
     void initGlut(int argc, char *argv[]){
     
         glutInit(&argc, argv);
@@ -45,6 +55,7 @@ struct OpenGLStarter{
         glutCreateWindow(openGLConfig.windowName.c_str());
 
         glutKeyboardUpFunc(keyup);
+        glutDisplayFunc(renderScene);
 
     }
 

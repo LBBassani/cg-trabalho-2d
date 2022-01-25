@@ -2,27 +2,31 @@
 #define MODEL
 
 #include <GL/gl.h>
+#include <string>
 
-#include "Third-Party-Libs/glm/glm.hpp"
+#include "Shape.hpp"
+#include "../Third-Party-Libs/glm/glm.hpp"
 
-struct Shape{
-
-    virtual void draw() = 0;
-
-};
 
 struct Model{
 
-    Shape *shape;
+    std::string nome;
+    Shape *shape = nullptr;
+    Shape *hitbox = nullptr;
     glm::vec3 color;
 
-    virtual glm::vec3 getColor() {return color; };
+    virtual std::string getNome() { return nome; };
+    virtual void setNome(std::string nome) { this->nome = nome; };
+    virtual glm::vec3 getColor() { return color; };
     virtual void setColor(glm::vec3 color){ this->color = color; };
     virtual Shape *getShape() { return shape; };
     virtual void setShape(Shape *shape){ this->shape = shape; };
+    virtual Shape *getHitbox() { return hitbox; };
+    virtual void setHitbox(Shape *hitbox) { this->hitbox = hitbox; };
+
     void draw(){
         glColor3f(color.x, color.y, color.z);
-        shape->draw();
+        if (shape) shape->draw();
     }
 };
 

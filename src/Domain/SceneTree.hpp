@@ -1,27 +1,26 @@
-#if !define SCENE_TREE
+#if !defined SCENE_TREE
 #define SCENE_TREE
 
 #include <list>
 #include <memory>
 
-#include "Trasnform.hpp"
+#include "Transform.hpp"
 #include "Model.hpp"
 
 struct Entity : public Model
 {
     Transform transform;
 
-    std::list<std::unique_ptr<Entity>> children;
+    std::list<Entity*> children;
     Entity* parent = nullptr;
 
-    template<typename... TArgs>
-    void addChild(const TArgs&... args){
-        children.emplace_back(std::make_unique<Entity>(args...));
+    void addChild(Entity* entity){
+        children.emplace_back(entity);
         children.back()->parent = this;
     }
 
     void removeChild(Entity* child){
-        children.remove_if([child](const std::unique_ptr<Entity>& ptr){ ptr.get() == child; });
+        children.remove_if([child](const Entity* ptr){ return ptr == child; });
     }
 
     void removeSelf(){
@@ -40,12 +39,30 @@ struct Entity : public Model
         }
     }
 
+    virtual void draw(){
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glLoadMatrixf(&transform.modelMatrix[0][0]);
+
+        Model::draw();
+
+        glPopMatrix();
+
+        for(auto child : children){
+            child->draw();
+        }
+    }
+
 };
 
 struct SceneTree{
-    std::unique_ptr<Entity> root;
+    Entity* root;
 
-    void draw(){ };
+    void draw(){ 
+        root->updateSelfAndChildren();
+        root->draw();
+    };
 };
 
 
