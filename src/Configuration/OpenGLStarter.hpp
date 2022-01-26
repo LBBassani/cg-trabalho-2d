@@ -34,7 +34,6 @@ struct OpenGLStarter{
 
     static void keyup(unsigned char key, int x, int y){
         instance->keyStatus[(int)(tolower(key))] = 0;
-        glutPostRedisplay();
     }
 
     static void renderScene(void){
@@ -43,6 +42,7 @@ struct OpenGLStarter{
         instance->sceneTree.draw(); // Desenha cena no buffer
 
         glutSwapBuffers(); // Desenha a cena do buffer na tela
+        glutPostRedisplay();
     }
 
     static void idle(void){
@@ -61,7 +61,6 @@ struct OpenGLStarter{
             exit(0);
 
         instance->keyStatus[(int) tolower(key)] = 1;
-        glutPostRedisplay();
     }
 
     void initGlut(int argc, char *argv[]){
