@@ -15,11 +15,11 @@ struct ParserSVG{
 
     static Entity* parseSVG(std::string &svgFileName) {
 
-        Entity* scene_root = new Camera();
-        scene_root->setNome("camera");
+        Camera* scene_root = new Camera();
+        scene_root->setNome("Camera");
 
         Entity* background = new Entity();
-        background->setNome("background");
+        background->setNome("Background");
 
         rapidxml::xml_document<> doc;
         rapidxml::xml_node<> * root_node = NULL;
@@ -34,6 +34,8 @@ struct ParserSVG{
 
         bool bigger_width_than_height = true;
         float zoom_factor, x_0, y_0, x_offset, y_offset, background_width, background_height;
+
+        int enemy_count = 0, plataforma_count = 0;
 
         for(auto shape_node = root_node->first_node(); shape_node; shape_node = shape_node->next_sibling()){
             // Atributos de forma e cor
@@ -67,9 +69,17 @@ struct ParserSVG{
                 newBackgroundModel->setColor(getColorCode(colorName));
                 newBackgroundModel->transform.position.x = x - x_0 + width/2;
                 newBackgroundModel->transform.position.y = -y - y_0 - height;
-                colorName != "blue" ? newBackgroundModel->setNome("plataforma") : newBackgroundModel->setNome("background");
+                if(colorName != "blue") {
+                    plataforma_count++;
+                    std::string model_name = "Plataforma ";
+                    model_name.append(std::to_string(plataforma_count));
+                    newBackgroundModel->setNome(model_name);
+                } else {
+                    newBackgroundModel->setNome("Sky");    
+                }
                 
                 background->addChild(newBackgroundModel);
+                
             } else if (nodeName == "circle"){
 
                 float   r = atof(shape_node->first_attribute("r")->value()),
@@ -78,15 +88,22 @@ struct ParserSVG{
 
                 Character* character = nullptr;
                 if(colorName == "green"){
-                    character = new Player(r*2);
+                    Player* player = new Player(r*2);
+                    character = player;
+                    character->setNome("Player");
+                    scene_root->setPlayer(player);
+                    background->transform.position.x = -(x - x_0 + r/2);
                 } else{
+                    enemy_count++;
+                    std::string character_name = "Enemy ";
+                    character_name.append(std::to_string(enemy_count));
                     character = new Enemy(r*2);
+                    character->setNome(character_name);
                 }
 
                 character->setHitbox(new Rect(r*2, r*2));
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
-                character->setNome("Character");
 
                 background->addChild(character);
             }

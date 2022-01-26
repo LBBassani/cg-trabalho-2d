@@ -17,14 +17,13 @@ int main(int argc, char *argv[]){
 
     std::string arquivo("../scenario/arena_teste.svg");
     SceneTree sceneTree;
+    sceneTree.root = ParserSVG::parseSVG(arquivo);
 
     #if defined TEST
 
-    sceneTree.root = new Player(200);
+    sceneTree.print();
 
-    #else
-
-    sceneTree.root = ParserSVG::parseSVG(arquivo);
+    return 0;
     
     #endif    
     

@@ -13,8 +13,14 @@ struct Camera : public MovingEntity{
     bool is_there_a_player_to_follow = false;
     int auto_key_last_value = 0;
 
-    Camera(float velocity = 0.02f){
+    Camera(float velocity = 0.5f){
         this->velocity = velocity;
+
+        this->x_moveConfigurations.max = 5000;
+        this->x_moveConfigurations.min = -5000;
+
+        this->y_moveConfigurations.max = 5000;
+        this->y_moveConfigurations.min = -5000;
     }
 
     void setPlayer(Player* player){
@@ -49,34 +55,29 @@ struct Camera : public MovingEntity{
             auto_key_last_value = keyStatus[(int) ('c')]; //debouncing
             if(keyStatus[(int) ('c')])
                 setAuto(!is_auto);
-                is_auto ? std::cout << "Camera configurada para automática" << std::endl : std::cout << "Camera configurada para manual" << std::endl;
         }
 
         if(is_auto){
             if(is_there_a_player_to_follow){
-                float   new_x_position = player_to_follow->transform.position.x,
-                        new_y_position = player_to_follow->transform.position.y;
+                float   new_x_position = player_to_follow->transform.position.x;
 
                 if(new_x_position > this->x_moveConfigurations.min && new_x_position < this->x_moveConfigurations.max)
-                    this->transform.position.x = new_x_position;
-                
-                if(new_y_position > this->y_moveConfigurations.min && new_y_position < this->y_moveConfigurations.max)
-                    this->transform.position.y = new_y_position;
+                    (*this->children.begin())->transform.position.x = -new_x_position;
 
             }
         }else{
             if (keyStatus[(int)('j')]){
-                this->x_moveConfigurations.velocity = -velocity;
-            } else if (keyStatus[(int)('l')]){
                 this->x_moveConfigurations.velocity = velocity;
+            } else if (keyStatus[(int)('l')]){
+                this->x_moveConfigurations.velocity = -velocity;
             } else {
                 this->x_moveConfigurations.velocity = 0.0f;
             }
 
             if (keyStatus[(int)('i')]){
-                this->y_moveConfigurations.velocity = velocity;
-            } else if (keyStatus[(int)('k')]){
                 this->y_moveConfigurations.velocity = -velocity;
+            } else if (keyStatus[(int)('k')]){
+                this->y_moveConfigurations.velocity = velocity;
             } else {
                 this->y_moveConfigurations.velocity = 0.0f;
             }
