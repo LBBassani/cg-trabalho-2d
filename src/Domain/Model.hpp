@@ -25,7 +25,6 @@ struct Model{
     virtual void setHitbox(Shape *hitbox) { this->hitbox = hitbox; };
 
     virtual void draw(){
-        std::cout << "Desenhando " << this->nome << std::endl;
         glColor3f(color.x, color.y, color.z);
         if (shape) shape->draw();
     }

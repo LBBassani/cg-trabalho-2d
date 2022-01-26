@@ -7,8 +7,13 @@
 #include "Transform.hpp"
 #include "Model.hpp"
 
+struct MovingEntity;
+
 struct Entity : public Model
 {
+
+    bool is_movable = false;
+
     Transform transform;
 
     std::list<Entity*> children;
@@ -54,6 +59,19 @@ struct Entity : public Model
         }
     }
 
+    virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in movingEntities classes */};
+
+    virtual void idle(int* keyStatus, GLdouble deltaTime){
+        if(this->is_movable){
+            this->act(keyStatus, deltaTime);
+            
+        }
+
+        for(auto child : children){
+            child->idle(keyStatus, deltaTime);
+        }
+    }
+
 };
 
 struct SceneTree{
@@ -63,6 +81,10 @@ struct SceneTree{
         root->updateSelfAndChildren();
         root->draw();
     };
+
+    void idle(int* keyStatus, GLdouble deltaTime){
+        root->idle(keyStatus, deltaTime);
+    }
 };
 
 

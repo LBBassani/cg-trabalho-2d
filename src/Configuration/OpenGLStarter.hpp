@@ -11,6 +11,7 @@
 #include "../Domain/SceneTree.hpp"
 
 struct OpenGLStarter{
+    GLdouble framerate = 0;
     OpenGLConfig openGLConfig;
     int keyStatus[256];
     SceneTree sceneTree;
@@ -44,6 +45,36 @@ struct OpenGLStarter{
         glutSwapBuffers(); // Desenha a cena do buffer na tela
     }
 
+    static void idle(void){
+        static GLdouble prevTime = glutGet(GLUT_ELAPSED_TIME);
+        GLdouble curTime, deltaTime;
+        curTime = glutGet(GLUT_ELAPSED_TIME);
+        deltaTime = curTime - prevTime;
+        prevTime = curTime;
+        instance->framerate = 1.0 / deltaTime * 1000;
+
+        instance->sceneTree.idle(instance->keyStatus, deltaTime);
+    }
+
+    static void keyPress(unsigned char key, int, int){
+        switch (key)
+        {
+        case 'a':
+        case 'A':
+            instance->keyStatus[(int) ('a')] = 1;
+            break;
+        case 'd':
+        case 'D':
+            instance->keyStatus[(int) ('d')] = 1;
+            break;
+        case 27 :
+            exit(0);
+        default:
+            break;
+        }
+        glutPostRedisplay();
+    }
+
     void initGlut(int argc, char *argv[]){
     
         glutInit(&argc, argv);
@@ -55,7 +86,9 @@ struct OpenGLStarter{
         glutCreateWindow(openGLConfig.windowName.c_str());
 
         glutKeyboardUpFunc(keyup);
+        glutKeyboardFunc(keyPress);
         glutDisplayFunc(renderScene);
+        glutIdleFunc(idle);
 
     }
 
