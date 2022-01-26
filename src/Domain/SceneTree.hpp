@@ -44,15 +44,19 @@ struct Entity : public Model
         }
     }
 
+    void print(){
+        std::cout << this->nome << std::endl;
+        for(auto child : children){
+            child->print();
+        }
+    }
+
     virtual void draw(){
         glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
         glLoadIdentity();
         glLoadMatrixf(&transform.modelMatrix[0][0]);
 
         Model::draw();
-
-        glPopMatrix();
 
         for(auto child : children){
             child->draw();
@@ -64,7 +68,6 @@ struct Entity : public Model
     virtual void idle(int* keyStatus, GLdouble deltaTime){
         if(this->is_movable){
             this->act(keyStatus, deltaTime);
-            
         }
 
         for(auto child : children){
@@ -78,12 +81,20 @@ struct SceneTree{
     Entity* root;
 
     void draw(){ 
-        root->updateSelfAndChildren();
+        updateSceneTree();
         root->draw();
     };
 
     void idle(int* keyStatus, GLdouble deltaTime){
         root->idle(keyStatus, deltaTime);
+    }
+
+    void print(){
+        root->print();
+    }
+
+    void updateSceneTree(){
+        root->updateSelfAndChildren();
     }
 };
 
