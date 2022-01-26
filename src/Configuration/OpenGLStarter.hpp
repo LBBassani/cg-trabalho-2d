@@ -33,7 +33,7 @@ struct OpenGLStarter{
     }
 
     static void keyup(unsigned char key, int x, int y){
-        instance->keyStatus[(int)(key)] = 0;
+        instance->keyStatus[(int)(tolower(key))] = 0;
         glutPostRedisplay();
     }
 
