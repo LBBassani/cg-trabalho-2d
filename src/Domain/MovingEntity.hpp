@@ -20,6 +20,7 @@ struct MoveConfigurations{
 struct MovingEntity : public Entity{
 
 
+    float velocity = 0.0f;
     MoveConfigurations x_moveConfigurations;
     MoveConfigurations y_moveConfigurations;
     MoveConfigurations angular_moveConfigurations;    

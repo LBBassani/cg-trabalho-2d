@@ -57,21 +57,10 @@ struct OpenGLStarter{
     }
 
     static void keyPress(unsigned char key, int, int){
-        switch (key)
-        {
-        case 'a':
-        case 'A':
-            instance->keyStatus[(int) ('a')] = 1;
-            break;
-        case 'd':
-        case 'D':
-            instance->keyStatus[(int) ('d')] = 1;
-            break;
-        case 27 :
+        if( key == 27 )
             exit(0);
-        default:
-            break;
-        }
+
+        instance->keyStatus[(int) tolower(key)] = 1;
         glutPostRedisplay();
     }
 

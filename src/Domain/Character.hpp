@@ -114,9 +114,8 @@ struct Character : public MovingEntity{
 
 struct Player : public Character{
 
-    float velocity = 0.02f;
-
     Player(float height = Character::original_height) : Character(height) {
+        this->velocity = 0.02f;
         this->x_moveConfigurations.max = 1000.0f;
         this->y_moveConfigurations.max = 500.0f;
         

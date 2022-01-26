@@ -8,13 +8,15 @@
 
 #include "../Domain/SceneTree.hpp"
 #include "../Domain/Character.hpp"
+#include "../Domain/Camera.hpp"
 #include "../Third-Party-Libs/rapidxml-1.13/rapidxml.hpp"
 
 struct ParserSVG{
 
     static Entity* parseSVG(std::string &svgFileName) {
 
-        Entity* scene_root = new Entity();
+        Entity* scene_root = new Camera();
+        scene_root->setNome("camera");
 
         Entity* background = new Entity();
         background->setNome("background");
@@ -61,11 +63,11 @@ struct ParserSVG{
 
                 Entity* newBackgroundModel = new Entity();
                 bigger_width_than_height ? newBackgroundModel->setShape(new Rect(width, height)) : newBackgroundModel->setShape(new Rect(height, width));
-                newBackgroundModel->setHitbox(newBackgroundModel->getShape());
+                if(colorName != "blue") newBackgroundModel->setHitbox(newBackgroundModel->getShape()); // background não deve ter hitbox 
                 newBackgroundModel->setColor(getColorCode(colorName));
                 newBackgroundModel->transform.position.x = x - x_0 + width/2;
                 newBackgroundModel->transform.position.y = -y - y_0 - height;
-                newBackgroundModel->setNome("Rect");
+                colorName != "blue" ? newBackgroundModel->setNome("plataforma") : newBackgroundModel->setNome("background");
                 
                 background->addChild(newBackgroundModel);
             } else if (nodeName == "circle"){
