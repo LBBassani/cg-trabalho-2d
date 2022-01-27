@@ -101,7 +101,7 @@ struct ParserSVG{
                     character->setNome(character_name);
                 }
 
-                character->setHitbox(new Rect(r*2, r*2));
+                character->setHitbox(new Rect(r*2, r*2), glm::vec2(0.0f, -r));
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
 
