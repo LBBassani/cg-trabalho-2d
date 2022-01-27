@@ -96,15 +96,15 @@ struct ParserSVG{
                     parede->setNome("Limite superior");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, height/2));
-                    //background->addChild(parede);
+                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, height));
+                    background->addChild(parede);
 
                     parede = new Entity();
                     parede->setNome("Limite inferior");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, -height/2));
-                    //background->addChild(parede);
+                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, 0.0f));
+                    background->addChild(parede);
                 }
                 
                 background->addChild(newBackgroundModel);
