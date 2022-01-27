@@ -3,7 +3,7 @@
 
 #include "GL/gl.h"
 
-#include "SceneTree.hpp"
+#include "Entity.hpp"
 
 struct MoveConfigurations{
     float max;
