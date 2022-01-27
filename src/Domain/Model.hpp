@@ -30,8 +30,9 @@ struct Model{
         glColor3f(color.x, color.y, color.z);
         if (shape) shape->draw();
         #if defined TEST
-        //glColor3f(1.0f, 1.0f, 1.0f);
-        //if (hitbox) hitbox->draw();
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTranslatef(hitbox_offset.x, hitbox_offset.y, 0.0f);
+            if (hitbox) hitbox->draw();
         #endif
     }
 };
