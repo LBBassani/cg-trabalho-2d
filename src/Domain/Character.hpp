@@ -115,6 +115,7 @@ struct Character : public MovingEntity{
 struct Player : public Character{
 
     Player(float height = Character::original_height) : Character(height) {
+        this->is_player = true;
         this->velocity = 0.02f;
         this->x_moveConfigurations.max = 1000.0f;
         this->y_moveConfigurations.max = 500.0f;
@@ -131,6 +132,12 @@ struct Player : public Character{
             this->x_moveConfigurations.velocity = velocity;
         } else {
             this->x_moveConfigurations.velocity = 0.0f;
+        }
+
+        if (keyStatus[(int)('w')]){
+            this->y_moveConfigurations.velocity = velocity;
+        } else {
+            this->y_moveConfigurations.velocity = -velocity;
         }
 
         this->move(deltaTime);
