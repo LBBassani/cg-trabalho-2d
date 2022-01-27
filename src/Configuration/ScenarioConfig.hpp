@@ -145,6 +145,9 @@ struct ParserSVG{
         // Configura zoom da tela
         scene_root->transform.scale.x = zoom_factor;
         scene_root->transform.scale.y = zoom_factor;
+        #if defined TEST
+            std::cout << zoom_factor << std::endl;
+        #endif
             
         return scene_root;
     }
