@@ -136,9 +136,17 @@ struct Player : public Character{
 
         if (keyStatus[(int)('w')]){
             this->y_moveConfigurations.velocity = velocity;
+        #if defined TEST
+        } else if (keyStatus[(int)('s')]){
+            this->y_moveConfigurations.velocity = -velocity;
+        }else{
+            this->y_moveConfigurations.velocity = 0.0f;
+        }
+        #else
         } else {
             this->y_moveConfigurations.velocity = -velocity;
         }
+        #endif
 
         this->move(deltaTime);
     }
