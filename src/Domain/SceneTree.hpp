@@ -2,88 +2,70 @@
 #define SCENE_TREE
 
 #include <list>
-#include <memory>
-
-#include "Transform.hpp"
-#include "Model.hpp"
-
-struct MovingEntity;
-
-struct Entity : public Model
-{
-
-    bool is_movable = false;
-
-    Transform transform;
-
-    std::list<Entity*> children;
-    Entity* parent = nullptr;
-
-    void addChild(Entity* entity){
-        children.emplace_back(entity);
-        children.back()->parent = this;
-    }
-
-    void removeChild(Entity* child){
-        children.remove_if([child](const Entity* ptr){ return ptr == child; });
-    }
-
-    void removeSelf(){
-        parent->removeChild(this);
-        parent = nullptr;
-    }
-
-    void updateSelfAndChildren(){
-        if (parent)
-            transform.modelMatrix = parent->transform.modelMatrix * transform.getLocalModelMatrix();
-        else
-            transform.modelMatrix = transform.getLocalModelMatrix();
-
-        for (auto&& child : children){
-            child->updateSelfAndChildren();
-        }
-    }
-
-    void print(){
-        std::cout << this->nome << std::endl;
-        for(auto child : children){
-            child->print();
-        }
-    }
-
-    virtual void draw(){
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glLoadMatrixf(&transform.modelMatrix[0][0]);
-
-        Model::draw();
-
-        for(auto child : children){
-            child->draw();
-        }
-    }
-
-    virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in movingEntities classes */};
-
-    virtual void idle(int* keyStatus, GLdouble deltaTime){
-        if(this->is_movable){
-            this->act(keyStatus, deltaTime);
-        }
-
-        for(auto child : children){
-            child->idle(keyStatus, deltaTime);
-        }
-    }
-
-};
+#include "Entity.hpp"
+#include "HitboxMapping.hpp"
 
 struct SceneTree{
     Entity* root;
+    std::list<HitboxMapping> static_hitbox_mapping;
+
+    void updateHitboxMapping(){
+        bool moving_cond = false; // apenas entidades que não se movem
+        static_hitbox_mapping = hitboxMappingList(moving_cond);
+    }
+    
+    std::list<HitboxMapping> hitboxMappingList(bool moving_cond){
+        std::list<Entity*> entities;
+        root->flattenTree(&entities);
+        std::list<HitboxMapping> resp;
+
+        for(auto entity : entities){
+            if(entity->is_movable == moving_cond && entity->hitbox){
+                HitboxMapping hm;
+                
+                if (!entity->hitbox) continue;
+                hm.entity_ptr = entity;
+                hm.update_hitbox();
+                resp.push_back(hm);
+            }
+        }
+
+        return resp;
+    }
 
     void draw(){ 
         updateSceneTree();
         root->draw();
+        #if defined TEST
+        
+        draw_hitboxes();
+        
+        #endif
     };
+
+    void draw_hitboxes(){
+        // calcula as liberdades de movimento dos objetos em cena
+        bool moving_cond = true; // apenas entidades que se movem
+        std::list<HitboxMapping> dynamic_hitbox_mapping = hitboxMappingList(moving_cond);
+
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPointSize(2);
+        glLoadIdentity();
+        glBegin (GL_POINTS);
+        for(auto dynamic_hitbox : dynamic_hitbox_mapping){
+            glVertex2f(dynamic_hitbox.canto_inf_esquerdo.x, dynamic_hitbox.canto_inf_esquerdo.y);
+            glVertex2f(dynamic_hitbox.canto_sup_direito.x, dynamic_hitbox.canto_sup_direito.y);
+        }
+        glEnd();
+
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glBegin (GL_POINTS);
+        for(auto static_hitbox : static_hitbox_mapping){
+            glVertex2f(static_hitbox.canto_inf_esquerdo.x, static_hitbox.canto_inf_esquerdo.y);
+            glVertex2f(static_hitbox.canto_sup_direito.x, static_hitbox.canto_sup_direito.y);
+        }
+        glEnd();
+    }
 
     void idle(int* keyStatus, GLdouble deltaTime){
         root->idle(keyStatus, deltaTime);
@@ -95,6 +77,37 @@ struct SceneTree{
 
     void updateSceneTree(){
         root->updateSelfAndChildren();
+
+        // calcula as liberdades de movimento dos objetos em cena
+        bool moving_cond = true; // apenas entidades que se movem
+        std::list<HitboxMapping> dynamic_hitbox_mapping = hitboxMappingList(moving_cond);
+
+        for(auto dynamic_hitbox : dynamic_hitbox_mapping){
+            if (!dynamic_hitbox.entity_ptr->is_player) continue;
+
+            std::list<HitboxMapping> collisions;
+            
+            bool colidiu = false;
+            for(auto static_hitbox : static_hitbox_mapping){
+                #if defined TEST
+                    //dynamic_hitbox.is_colliding(static_hitbox) ? std::cout << "Colisão entre " << dynamic_hitbox.entity_ptr->getNome() << " e " << static_hitbox.entity_ptr->getNome() << std::endl : std::cout << "Sem colisão entre " << dynamic_hitbox.entity_ptr->getNome() << " e " << static_hitbox.entity_ptr->getNome() << std::endl;
+                #endif
+                if(dynamic_hitbox.is_colliding(static_hitbox)){ 
+                    collisions.push_back(static_hitbox);
+                    colidiu = true;
+                }
+            }
+
+            if (colidiu) dynamic_hitbox.entity_ptr->do_collision(collisions);
+            else {
+                dynamic_hitbox.entity_ptr->moveLiberty = MoveLiberty();
+                #if defined TEST
+                    std::cout << "Pode mover pra onde quiser!!" << std::endl;
+                #endif    
+            }
+            
+        }
+
     }
 };
 

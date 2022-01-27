@@ -19,11 +19,12 @@ int main(int argc, char *argv[]){
     SceneTree sceneTree;
     sceneTree.root = ParserSVG::parseSVG(arquivo);
 
+    sceneTree.updateHitboxMapping();
+
     #if defined TEST
 
     sceneTree.print();
-
-    return 0;
+    //return 0;
     
     #endif    
     
