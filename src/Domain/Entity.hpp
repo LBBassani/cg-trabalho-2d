@@ -6,6 +6,8 @@
 #include "Transform.hpp"
 #include "Model.hpp"
 
+struct HitboxMapping;
+
 struct MoveLiberty{
     bool direita = true;
     bool esquerda = true;
@@ -72,7 +74,7 @@ struct Entity : public Model
 
     virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in movingEntities classes */};
 
-    virtual void is_coliding(){};
+    virtual void do_collision(std::list<HitboxMapping> colliding_hitbox) { /* does nothing, implemented in child classes */};
 
     virtual void idle(int* keyStatus, GLdouble deltaTime){
         if(this->is_movable){
