@@ -27,6 +27,10 @@ struct Model{
     virtual void draw(){
         glColor3f(color.x, color.y, color.z);
         if (shape) shape->draw();
+        #if defined TEST
+        glColor3f(1.0f, 1.0f, 1.0f);
+        if (hitbox) hitbox->draw();
+        #endif
     }
 };
 
