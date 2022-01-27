@@ -75,7 +75,36 @@ struct ParserSVG{
                     model_name.append(std::to_string(plataforma_count));
                     newBackgroundModel->setNome(model_name);
                 } else {
-                    newBackgroundModel->setNome("Sky");    
+                    newBackgroundModel->setNome("Sky");  
+                    
+                    Entity* parede = new Entity();
+                    // Hitbox das paredes do cenário
+                    parede->setNome("Limite lateral esquerdo");
+                    parede->transform.position.x = newBackgroundModel->transform.position.x;
+                    parede->transform.position.y = newBackgroundModel->transform.position.y;
+                    parede->setHitbox(new Rect(1.0f, height), glm::vec2(-width/2, 0.0f));
+                    background->addChild(parede);
+
+                    parede = new Entity();
+                    parede->setNome("Limite lateral direito");
+                    parede->transform.position.x = newBackgroundModel->transform.position.x;
+                    parede->transform.position.y = newBackgroundModel->transform.position.y;
+                    parede->setHitbox(new Rect(1.0f, height), glm::vec2(width/2, 0.0f));
+                    background->addChild(parede);
+
+                    parede = new Entity();
+                    parede->setNome("Limite superior");
+                    parede->transform.position.x = newBackgroundModel->transform.position.x;
+                    parede->transform.position.y = newBackgroundModel->transform.position.y;
+                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, height/2));
+                    //background->addChild(parede);
+
+                    parede = new Entity();
+                    parede->setNome("Limite inferior");
+                    parede->transform.position.x = newBackgroundModel->transform.position.x;
+                    parede->transform.position.y = newBackgroundModel->transform.position.y;
+                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, -height/2));
+                    //background->addChild(parede);
                 }
                 
                 background->addChild(newBackgroundModel);
@@ -94,14 +123,13 @@ struct ParserSVG{
                     scene_root->setPlayer(player);
                     background->transform.position.x = -(x - x_0 + r/2);
                 } else{
+                    character = new Enemy(r*2);
                     enemy_count++;
                     std::string character_name = "Enemy ";
                     character_name.append(std::to_string(enemy_count));
-                    character = new Enemy(r*2);
                     character->setNome(character_name);
                 }
 
-                character->setHitbox(new Rect(r*2, r*2), glm::vec2(0.0f, -r));
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
 
