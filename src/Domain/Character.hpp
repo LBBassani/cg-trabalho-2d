@@ -43,28 +43,24 @@ struct Character : public MovingEntity{
     Character(float height = Character::original_height, CharacterConfigurations config = CharacterConfigurations()){
         this->height = height;
         this->config = config;
-        float width = height*config.tronco_width, boundary_size = 0.01;
+        float width = height*config.tronco_width, boundary_size = 1;
 
         // Hitbox e boundaries do boneco
         setHitbox(new Rect(width, height), glm::vec2(0.0f, -height/2));
 
-        boundaries.limite_direito.parent = this;
         boundaries.limite_direito.transform.position.x = width/2 + boundary_size/2;
         boundaries.limite_direito.setHitbox(new Rect(boundary_size, height), glm::vec2(0.0f, -height/2));
         this->addChild(&boundaries.limite_direito);
 
-        boundaries.limite_esquerdo.parent = this;
         boundaries.limite_esquerdo.transform.position.x = -width/2 - boundary_size/2;
         boundaries.limite_esquerdo.setHitbox(new Rect(boundary_size, height), glm::vec2(0.0f, -height/2));
         this->addChild(&boundaries.limite_esquerdo);
 
-        boundaries.limite_inferior.parent = this;
-        boundaries.limite_inferior.transform.position.y = -height/2 - boundary_size/2;
+        boundaries.limite_inferior.transform.position.y = -boundary_size;
         boundaries.limite_inferior.setHitbox(new Rect(width, boundary_size), glm::vec2(0.0f, -height/2));
         this->addChild(&boundaries.limite_inferior);
 
-        boundaries.limite_superior.parent = this;
-        boundaries.limite_superior.transform.position.y = height/2 + boundary_size/2;
+        boundaries.limite_superior.transform.position.y = height;
         boundaries.limite_superior.setHitbox(new Rect(width, boundary_size), glm::vec2(0.0f, -height/2));
         this->addChild(&boundaries.limite_superior);
 
