@@ -4,6 +4,7 @@
 #include "GL/gl.h"
 
 #include "Entity.hpp"
+#include "SceneTree.hpp"
 
 struct MoveConfigurations{
     float max;
@@ -37,7 +38,7 @@ struct MovingEntity : public Entity{
      * @brief Função que deve decidir a ação que a entidade irá tomar com base na tecla
      * @param key : tecla que foi acionada
      */
-    virtual void act(int* keyStatus, GLdouble deltaTime) = 0;
+    virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in child classes */ };
 
     /*
      * @brief Função genérica de movimento de translação
