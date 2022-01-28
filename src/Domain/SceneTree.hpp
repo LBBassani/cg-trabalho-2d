@@ -48,7 +48,7 @@ struct SceneTree{
         bool moving_cond = true; // apenas entidades que se movem
         std::list<HitboxMapping> dynamic_hitbox_mapping = hitboxMappingList(moving_cond);
 
-        glColor3f(1.0f, 1.0f, 1.0f);
+        glColor3f(1.0f, 0.0f, 0.5f);
         glPointSize(2);
         glLoadIdentity();
         glBegin (GL_POINTS);
@@ -81,6 +81,8 @@ struct SceneTree{
         // calcula as liberdades de movimento dos objetos em cena
         bool moving_cond = true; // apenas entidades que se movem
         std::list<HitboxMapping> dynamic_hitbox_mapping = hitboxMappingList(moving_cond);
+
+        this->updateHitboxMapping();
 
         for(auto dynamic_hitbox : dynamic_hitbox_mapping){
             if (!dynamic_hitbox.entity_ptr->is_player) continue;
