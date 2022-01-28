@@ -126,8 +126,8 @@ struct OpenGLStarter{
         #endif
 
         instance->mouse->update_position_on_world(x - instance->openGLConfig.width/2, - y + instance->openGLConfig.height/2);
-        instance->keyStatus[MOUSE_X_COORD] = instance->mouse->transform.position.x;
-        instance->keyStatus[MOUSE_Y_COORD] = instance->mouse->transform.position.y;
+        instance->keyStatus[MOUSE_X_COORD] = x - instance->openGLConfig.width/2;
+        instance->keyStatus[MOUSE_Y_COORD] = - y + instance->openGLConfig.height/2;
         #if defined TEST
             // std::cout << "Mouse em (" << instance->mouse->transform.position.x << ", " << instance->mouse->transform.position.y << ")" << std::endl;
         #endif
