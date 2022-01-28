@@ -137,7 +137,7 @@ struct ParserSVG{
                 character->y_moveConfigurations.max = character->transform.position.y + r*6; // Pula 3x a própria altura
 
                 background->addChild(character);
-                character->creat_boundaries();
+                character->create_boundaries();
             }
         }
 
