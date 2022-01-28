@@ -103,7 +103,7 @@ struct ParserSVG{
                     parede->setNome("Limite inferior");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, 0.0f));
+                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, -1.0f));
                     background->addChild(parede);
                 }
                 
@@ -133,10 +133,11 @@ struct ParserSVG{
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
 
-                character->y_moveConfigurations.min = character->transform.position.y;
+                character->y_moveConfigurations.min = character->transform.position.y - r;
                 character->y_moveConfigurations.max = character->transform.position.y + r*6; // Pula 3x a própria altura
 
                 background->addChild(character);
+                character->creat_boundaries();
             }
         }
 
