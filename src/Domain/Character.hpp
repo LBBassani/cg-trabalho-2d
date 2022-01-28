@@ -43,6 +43,8 @@ struct Character : public MovingEntity{
     float height;
     CharacterConfigurations config;
     Boundaries boundaries;
+    
+    bool can_jump = true;
 
     Character(float height = Character::original_height, CharacterConfigurations config = CharacterConfigurations()){
         this->height = height;
@@ -223,6 +225,7 @@ struct Character : public MovingEntity{
         
         if (collision[2]) {
             this->moveLiberty.para_cima = false;
+            this->can_jump = false;
             #if defined TEST
                 //std::cout << "Não pode mover pra cima" << std::endl;
             #endif
@@ -230,6 +233,8 @@ struct Character : public MovingEntity{
 
         if (collision[3]) {
             this->moveLiberty.para_baixo = false;
+            this->can_jump = true;
+            this->y_moveConfigurations.max = this->transform.position.y + 3*height;
             #if defined TEST
                 //std::cout << "Não pode mover pra baixo" << std::endl;
             #endif
@@ -237,7 +242,13 @@ struct Character : public MovingEntity{
     }
 
     virtual void move(GLdouble deltaTime){
-        MovingEntity::move(deltaTime);   
+        MovingEntity::move(deltaTime);
+
+        if(
+            this->transform.position.y + this->y_moveConfigurations.velocity*deltaTime >= this->y_moveConfigurations.max // Se chegou na altura máxima ou
+            || (this->y_moveConfigurations.velocity < 0 && moveLiberty.para_baixo)                                       // Se estava caindo e não terminou de cair ainda
+        ) 
+                this->can_jump = false; 
     }
 
 };
@@ -274,7 +285,7 @@ struct Player : public Character{
                 this->y_moveConfigurations.velocity = 0.0f;
             }
         #else
-            if(keyStatus[(int)(' ')]){
+            if(keyStatus[(int)(' ')] && this->can_jump){
                 this->y_moveConfigurations.velocity = height*3/1000;
             } else {
                 this->y_moveConfigurations.velocity = -height*3/1000;;

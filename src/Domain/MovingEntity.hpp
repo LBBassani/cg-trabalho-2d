@@ -22,7 +22,6 @@ struct MovingEntity : public Entity{
 
 
     float velocity = 0.0f;
-    bool can_jump = true;
     MoveConfigurations x_moveConfigurations;
     MoveConfigurations y_moveConfigurations;
     MoveConfigurations angular_moveConfigurations;
