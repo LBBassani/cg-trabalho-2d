@@ -100,11 +100,19 @@ struct SceneTree{
                 }
             }
 
+            for(auto another_dynamic_hitbox : dynamic_hitbox_mapping){
+                if(dynamic_hitbox.entity_ptr == another_dynamic_hitbox.entity_ptr) continue;
+                if(dynamic_hitbox.is_colliding(another_dynamic_hitbox)){
+                    collisions.push_back(another_dynamic_hitbox);
+                    colidiu = true;
+                }
+            }
+
             if (colidiu) dynamic_hitbox.entity_ptr->do_collision(collisions);
             else {
                 dynamic_hitbox.entity_ptr->moveLiberty = MoveLiberty();
                 #if defined TEST
-                    std::cout << "Pode mover pra onde quiser!!" << std::endl;
+                    //std::cout << "Pode mover pra onde quiser!!" << std::endl;
                 #endif    
             }
             
