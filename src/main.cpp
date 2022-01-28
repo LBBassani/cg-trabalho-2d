@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
     SceneTree sceneTree;
     sceneTree.root = ParserSVG::parseSVG(arquivo);
 
+    sceneTree.root->updateSelfAndChildren();
     sceneTree.updateHitboxMapping();
 
     #if defined TEST
