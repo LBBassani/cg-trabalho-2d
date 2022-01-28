@@ -24,13 +24,13 @@ struct CharacterConfigurations{
 };
 
 struct Boundaries{
-    MovingEntity* limite_direito;
+    Entity* limite_direito;
     glm::vec2 dist_direito;
-    MovingEntity* limite_esquerdo;
+    Entity* limite_esquerdo;
     glm::vec2 dist_esquerdo;
-    MovingEntity* limite_superior;
+    Entity* limite_superior;
     glm::vec2 dist_superior;
-    MovingEntity* limite_inferior;
+    Entity* limite_inferior;
     glm::vec2 dist_inferior;
 };
 
@@ -133,32 +133,28 @@ struct Character : public MovingEntity{
 
 
         boundaries.dist_direito.x = width/2 + boundary_size/2;
-        boundaries.limite_direito = new MovingEntity();
-        boundaries.limite_direito->transform = this->transform;
+        boundaries.limite_direito = new Entity();
         boundaries.limite_direito->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_direito.x, -height/2));
         boundaries.limite_direito->setNome("limite direito");
-        this->parent->addChild(boundaries.limite_direito);
+        this->addChild(boundaries.limite_direito);
 
         boundaries.dist_esquerdo.x = -width/2 - boundary_size/2;
-        boundaries.limite_esquerdo = new MovingEntity();
-        boundaries.limite_esquerdo->transform = this->transform;
+        boundaries.limite_esquerdo = new Entity();
         boundaries.limite_esquerdo->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_esquerdo.x, -height/2));
         boundaries.limite_esquerdo->setNome("limite esquerdo");
-        this->parent->addChild(boundaries.limite_esquerdo);
+        this->addChild(boundaries.limite_esquerdo);
 
         boundaries.dist_inferior.y = -boundary_size;
-        boundaries.limite_inferior = new MovingEntity();
-        boundaries.limite_inferior->transform = this->transform;
+        boundaries.limite_inferior = new Entity();
         boundaries.limite_inferior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_inferior.y -height/2));
         boundaries.limite_inferior->setNome("limite inferior");
-        this->parent->addChild(boundaries.limite_inferior);
+        this->addChild(boundaries.limite_inferior);
 
         boundaries.dist_superior.y = height;
-        boundaries.limite_superior = new MovingEntity();
-        boundaries.limite_superior->transform = this->transform;
+        boundaries.limite_superior = new Entity();
         boundaries.limite_superior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_superior.y -height/2));
         boundaries.limite_superior->setNome("limite superior");
-        this->parent->addChild(boundaries.limite_superior);
+        this->addChild(boundaries.limite_superior);
     }
 
     virtual void do_collision(std::list<HitboxMapping> colliding_hitboxes){
@@ -241,13 +237,7 @@ struct Character : public MovingEntity{
     }
 
     virtual void move(GLdouble deltaTime){
-        MovingEntity::move(deltaTime);
-
-        //Atualiza as boundaries
-        boundaries.limite_direito->transform = this->transform;
-        boundaries.limite_esquerdo->transform = this->transform;
-        boundaries.limite_superior->transform = this->transform;
-        boundaries.limite_inferior->transform = this->transform; 
+        MovingEntity::move(deltaTime);   
     }
 
 };
