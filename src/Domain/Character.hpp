@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "../Third-Party-Libs/glm/glm.hpp"
+#include "../Third-Party-Libs/glm/gtx/vector_angle.hpp"
 
 #include "HitboxMapping.hpp"
 #include "MovingEntity.hpp"
@@ -11,6 +12,8 @@
 
 #define MOUSE_LEFT_CLICK 256
 #define MOUSE_RIGHT_CLICK 257
+#define MOUSE_X_COORD 258
+#define MOUSE_Y_COORD 259
 
 struct CharacterConfigurations{
     float cabeca = 0.3;
@@ -41,11 +44,64 @@ struct RotatingRect : public MovingEntity{
     virtual void act(int* keyStatus, GLdouble deltaTime){ };
 };
 
+struct Braco : public MovingEntity{
+    
+    glm::vec2 target_position = {0.0f, 0.0f};
+    float height, width;
+    float max_angle, min_angle;
+
+    Braco(){
+        this->angular_moveConfigurations.velocity = 0.1f;
+        this->transform.pivot = { width/2, -height/2, 0.0f};
+    }
+    
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        
+        this->target_position = {keyStatus[MOUSE_X_COORD], keyStatus[MOUSE_Y_COORD]};
+
+        this->move(deltaTime);
+    }
+
+    virtual void flip(bool direita){
+        if(
+            (this->transform.eulerRotation.z < 90.0f && direita)
+            || (this->transform.eulerRotation.z > 90.0f && !direita)
+        ) return;
+        float angle_to_rotate = 2*(90 - this->transform.eulerRotation.z);
+        this->transform.eulerRotation.z += angle_to_rotate;
+    }
+
+    virtual void move(GLdouble deltaTime){
+        
+        // Coloca o braço pra rotacionar até o mouse
+        glm::vec4   braco_origem = {this->transform.position.x - width/2, this->transform.position.y + height/2, 0.0f, 1.0f},
+                    braco_final = {this->transform.position.x + width/2, this->transform.position.y + height/2, 0.0f, 1.0f},
+                    target = {target_position.x, target_position.y, 0.0f, 1.0f};
+        
+        braco_origem = this->transform.modelMatrix*braco_origem;
+        
+        float   angle_1 = atan2(target.y - braco_origem.y, target.x - braco_origem.x)*180/glm::pi<float>(),
+                angle_2 = this->transform.eulerRotation.z,
+                target_angle = angle_1 - angle_2;
+        int signal = target_angle >= 0 ? 1 : -1;
+        float new_angle = this->transform.eulerRotation.z + signal*angular_moveConfigurations.velocity*deltaTime;
+
+        #if defined TEST
+            std::cout << "Angulo calculado: " << angle_2 << ", Angulo real: " << this->transform.eulerRotation.z << std::endl;
+            //std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
+        #endif
+
+        this->transform.eulerRotation.z = std::min(this->max_angle, std::max(new_angle, min_angle));
+
+    }
+};
+
 struct Character : public MovingEntity{
     static constexpr float original_height = 30;
     float height;
     CharacterConfigurations config;
     Boundaries boundaries;
+    Braco* braco;
     
     bool can_jump = true;
 
@@ -81,12 +137,16 @@ struct Character : public MovingEntity{
         this->addChild(cabeca);
 
         // Monta o braço do boneco
-        Entity* braco = new RotatingRect();
-        Rect* braco_shape = new Rect(height*config.braco_width, height*config.braco_height);
+        this->braco = new Braco();
+        this->braco->width = height*config.braco_width;
+        this->braco->height = height*config.braco_height;
+        Rect* braco_shape = new Rect(this->braco->width, this->braco->height);
         braco->setNome("braço");
         braco->setShape(braco_shape);
         braco->setColor(config.braco_color);
-        braco->transform.position.x = height*config.braco_width/2;
+        braco->transform.position.x = this->braco->width/2;
+        braco->min_angle = -45.0f;
+        braco->max_angle = 45.0f;
 
         this->addChild(braco);
 
@@ -131,7 +191,7 @@ struct Character : public MovingEntity{
         
     }
 
-    virtual void creat_boundaries(){
+    virtual void create_boundaries(){
         if (!parent) return;
 
         float width = height*config.tronco_width, boundary_size = 1;
@@ -258,6 +318,7 @@ struct Character : public MovingEntity{
 
 struct Player : public Character{
 
+
     Player(float height = Character::original_height) : Character(height) {
         this->is_player = true;
         this->velocity = 0.02f;
@@ -266,8 +327,25 @@ struct Player : public Character{
         
         this->x_moveConfigurations.min = -1000.0f;
         this->y_moveConfigurations.min = 500.0f;
+    }
 
-     };
+    virtual void move(GLdouble deltaTime){
+        Character::move(deltaTime);
+
+        // Anima as perninhas
+
+        // Se mudar de direção, muda o braço de direção
+        /* if(this->x_moveConfigurations.velocity > 0.0f){
+            this->braco->transform.position.x = this->braco->width/2;
+            this->braco->transform.eulerRotation.z = 180.f;
+            this->braco->transform.position.y = this->braco->height;
+        } else if (this->x_moveConfigurations.velocity < 0.0f){
+            this->braco->transform.position.x = -this->braco->width/2;
+            this->braco->transform.eulerRotation.z = 0.0f;
+            this->braco->transform.position.y = 0.0f;
+        } */
+        
+    }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
         if (keyStatus[(int)('a')]){

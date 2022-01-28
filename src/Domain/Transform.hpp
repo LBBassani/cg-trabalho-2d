@@ -11,6 +11,7 @@ struct Transform
     glm::vec3 position = { 0.0f, 0.0f, 0.0f };
     glm::vec3 eulerRotation = { 0.0f, 0.0f, 0.0f };
     glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
+    glm::vec3 pivot = {0.0f, 0.0f, 0.0f};
 
     //Global space information concatenate in matrix
     glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -27,7 +28,7 @@ struct Transform
                             glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Y * X * Z
-        const glm::mat4 roationMatrix = transformY * transformX * transformZ;
+        const glm::mat4 roationMatrix = glm::translate(glm::mat4(1.0f), pivot) * transformY * transformX * transformZ * glm::inverse(glm::translate(glm::mat4(1.0f), pivot));
 
         // translation * rotation * scale (also know as TRS matrix)
         return glm::translate(glm::mat4(1.0f), position) *
