@@ -9,6 +9,9 @@
 #include "MovingEntity.hpp"
 #include "Shape.hpp"
 
+#define MOUSE_LEFT_CLICK 256
+#define MOUSE_RIGHT_CLICK 257
+
 struct CharacterConfigurations{
     float cabeca = 0.3;
     float tronco_height = 0.4;
@@ -285,7 +288,7 @@ struct Player : public Character{
                 this->y_moveConfigurations.velocity = 0.0f;
             }
         #else
-            if(keyStatus[(int)(' ')] && this->can_jump){
+            if(keyStatus[MOUSE_RIGHT_CLICK] && this->can_jump){
                 this->y_moveConfigurations.velocity = height*3/1000;
             } else {
                 this->y_moveConfigurations.velocity = -height*3/1000;;
