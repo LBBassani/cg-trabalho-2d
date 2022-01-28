@@ -35,12 +35,6 @@ struct MovingEntity : public Entity{
     }
 
     /*
-     * @brief Função que deve decidir a ação que a entidade irá tomar com base na tecla
-     * @param key : tecla que foi acionada
-     */
-    virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in child classes */ };
-
-    /*
      * @brief Função genérica de movimento de translação
      */
     virtual void move(GLdouble deltaTime){
