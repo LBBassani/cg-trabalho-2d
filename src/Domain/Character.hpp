@@ -163,7 +163,7 @@ struct Character : public MovingEntity{
 
     virtual void do_collision(std::list<HitboxMapping> colliding_hitboxes){
         #if defined TEST
-            std::cout << "Entrou em do collision" << std::endl;
+            //std::cout << "Entrou em do collision" << std::endl;
         #endif
         bool collision[] = {false, false, false, false};
 
@@ -201,10 +201,10 @@ struct Character : public MovingEntity{
 
             const int N = sizeof(collisions_area) / sizeof(float);
             #if defined TEST
-                for(auto valor : collisions_area){
+                /* for(auto valor : collisions_area){
                     std::cout << valor << " ";
                 }
-                std::cout << std::endl;
+                std::cout << std::endl; */
             #endif
 
             if(collisions_area[0] || collisions_area[1] || collisions_area[2] || collisions_area[3]) collision[(std::distance(collisions_area, std::max_element(collisions_area, collisions_area + N)))] = true;
@@ -214,28 +214,28 @@ struct Character : public MovingEntity{
         if (collision[0]) {
             this->moveLiberty.direita = false;
             #if defined TEST
-                std::cout << "Não pode mover pra direita" << std::endl;
+                //std::cout << "Não pode mover pra direita" << std::endl;
             #endif
         } else this->moveLiberty.direita = true;
 
         if (collision[1]) {
             this->moveLiberty.esquerda = false;
             #if defined TEST
-                std::cout << "Não pode mover pra esquerda" << std::endl;
+                //std::cout << "Não pode mover pra esquerda" << std::endl;
             #endif
         } else this->moveLiberty.esquerda = true;
         
         if (collision[2]) {
             this->moveLiberty.para_cima = false;
             #if defined TEST
-                std::cout << "Não pode mover pra cima" << std::endl;
+                //std::cout << "Não pode mover pra cima" << std::endl;
             #endif
         } else this->moveLiberty.para_cima = true;
 
         if (collision[3]) {
             this->moveLiberty.para_baixo = false;
             #if defined TEST
-                std::cout << "Não pode mover pra baixo" << std::endl;
+                //std::cout << "Não pode mover pra baixo" << std::endl;
             #endif
         } else this->moveLiberty.para_baixo = true;
     }
