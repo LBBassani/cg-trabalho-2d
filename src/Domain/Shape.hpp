@@ -57,4 +57,23 @@ struct Circ : public Shape{
     }
 };
 
+struct Triangle : public Shape{
+    GLfloat base, height;
+
+    Triangle(GLfloat base, GLfloat height){
+        this->base = base;
+        this->height = height;
+    }
+
+    virtual void draw(){
+        glBegin(GL_POLYGON);        //Começa o desenho do triangulo
+
+        glVertex2f(-base/2, 0.0f);  // Canto inferior esquerdo
+        glVertex2f(base/2, 0.0f);   // Canto inferior direito
+        glVertex2f(0.0f, height);   // Canto superior
+
+        glEnd();                    // Encerra o desenho
+    }
+};
+
 #endif
