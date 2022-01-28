@@ -24,10 +24,14 @@ struct CharacterConfigurations{
 };
 
 struct Boundaries{
-    MovingEntity limite_direito;
-    MovingEntity limite_esquerdo;
-    MovingEntity limite_superior;
-    MovingEntity limite_inferior;
+    MovingEntity* limite_direito;
+    glm::vec2 dist_direito;
+    MovingEntity* limite_esquerdo;
+    glm::vec2 dist_esquerdo;
+    MovingEntity* limite_superior;
+    glm::vec2 dist_superior;
+    MovingEntity* limite_inferior;
+    glm::vec2 dist_inferior;
 };
 
 struct RotatingRect : public MovingEntity{
@@ -43,27 +47,10 @@ struct Character : public MovingEntity{
     Character(float height = Character::original_height, CharacterConfigurations config = CharacterConfigurations()){
         this->height = height;
         this->config = config;
-        float width = height*config.tronco_width, boundary_size = 1;
+        float width = height*config.tronco_width;
 
-        // Hitbox e boundaries do boneco
+        // Hitbox do boneco
         setHitbox(new Rect(width, height), glm::vec2(0.0f, -height/2));
-
-        boundaries.limite_direito.transform.position.x = width/2 + boundary_size/2;
-        boundaries.limite_direito.setHitbox(new Rect(boundary_size, height), glm::vec2(0.0f, -height/2));
-        this->addChild(&boundaries.limite_direito);
-
-        boundaries.limite_esquerdo.transform.position.x = -width/2 - boundary_size/2;
-        boundaries.limite_esquerdo.setHitbox(new Rect(boundary_size, height), glm::vec2(0.0f, -height/2));
-        this->addChild(&boundaries.limite_esquerdo);
-
-        boundaries.limite_inferior.transform.position.y = -boundary_size;
-        boundaries.limite_inferior.setHitbox(new Rect(width, boundary_size), glm::vec2(0.0f, -height/2));
-        this->addChild(&boundaries.limite_inferior);
-
-        boundaries.limite_superior.transform.position.y = height;
-        boundaries.limite_superior.setHitbox(new Rect(width, boundary_size), glm::vec2(0.0f, -height/2));
-        this->addChild(&boundaries.limite_superior);
-
 
         // Monta o boneco
 
@@ -139,34 +126,80 @@ struct Character : public MovingEntity{
         
     }
 
+    virtual void creat_boundaries(){
+        if (!parent) return;
+
+        float width = height*config.tronco_width, boundary_size = 1;
+
+
+        boundaries.dist_direito.x = width/2 + boundary_size/2;
+        boundaries.limite_direito = new MovingEntity();
+        boundaries.limite_direito->transform = this->transform;
+        boundaries.limite_direito->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_direito.x, -height/2));
+        boundaries.limite_direito->setNome("limite direito");
+        this->parent->addChild(boundaries.limite_direito);
+
+        boundaries.dist_esquerdo.x = -width/2 - boundary_size/2;
+        boundaries.limite_esquerdo = new MovingEntity();
+        boundaries.limite_esquerdo->transform = this->transform;
+        boundaries.limite_esquerdo->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_esquerdo.x, -height/2));
+        boundaries.limite_esquerdo->setNome("limite esquerdo");
+        this->parent->addChild(boundaries.limite_esquerdo);
+
+        boundaries.dist_inferior.y = -boundary_size;
+        boundaries.limite_inferior = new MovingEntity();
+        boundaries.limite_inferior->transform = this->transform;
+        boundaries.limite_inferior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_inferior.y -height/2));
+        boundaries.limite_inferior->setNome("limite inferior");
+        this->parent->addChild(boundaries.limite_inferior);
+
+        boundaries.dist_superior.y = height;
+        boundaries.limite_superior = new MovingEntity();
+        boundaries.limite_superior->transform = this->transform;
+        boundaries.limite_superior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_superior.y -height/2));
+        boundaries.limite_superior->setNome("limite superior");
+        this->parent->addChild(boundaries.limite_superior);
+    }
+
     virtual void do_collision(std::list<HitboxMapping> colliding_hitboxes){
         #if defined TEST
             std::cout << "Entrou em do collision" << std::endl;
         #endif
         bool collision[] = {false, false, false, false};
 
-        HitboxMapping boundaries_hitboxes[] = {
-            HitboxMapping(&boundaries.limite_direito),
-            HitboxMapping(&boundaries.limite_esquerdo),
-            HitboxMapping(&boundaries.limite_superior),
-            HitboxMapping(&boundaries.limite_inferior)
+        HitboxMapping* boundaries_hitboxes[] = {
+            new HitboxMapping(boundaries.limite_direito),
+            new HitboxMapping(boundaries.limite_esquerdo),
+            new HitboxMapping(boundaries.limite_superior),
+            new HitboxMapping(boundaries.limite_inferior)
         };
 
-        for(auto boundary : boundaries_hitboxes){
-            boundary.update_hitbox();
+        for (auto boundary : boundaries_hitboxes){
+            boundary->update_hitbox();
         }
         
+        #if defined TEST
+            /* std::cout << colliding_hitboxes.begin()->entity_ptr->getNome() << " p1: (" << colliding_hitboxes.begin()->canto_inf_esquerdo.x << ", " << colliding_hitboxes.begin()->canto_inf_esquerdo.y << ") p2: (" << colliding_hitboxes.begin()->canto_sup_direito.x << ", " << colliding_hitboxes.begin()->canto_sup_direito.y << ") "<< std::endl;
+            exit (0); */
+        #endif
+
         for(auto colliding_hitbox : colliding_hitboxes){
 
             float collisions_area[] = {
-                boundaries_hitboxes[0].is_colliding(colliding_hitbox) ? boundaries_hitboxes[0].percentage_of_overlapping(colliding_hitbox) : 0,
-                boundaries_hitboxes[1].is_colliding(colliding_hitbox) ? boundaries_hitboxes[1].percentage_of_overlapping(colliding_hitbox) : 0,
-                boundaries_hitboxes[2].is_colliding(colliding_hitbox) ? boundaries_hitboxes[2].percentage_of_overlapping(colliding_hitbox) : 0,
-                boundaries_hitboxes[3].is_colliding(colliding_hitbox) ? boundaries_hitboxes[3].percentage_of_overlapping(colliding_hitbox) : 0
+                boundaries_hitboxes[0]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[0]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[1]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[1]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[2]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[2]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[3]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[3]->percentage_of_overlapping(colliding_hitbox) : 0
             };
 
-            const int N = sizeof(collisions_area) / sizeof(float);
+            #if defined TEST
+                /* std::cout << boundaries_hitboxes[0]->is_colliding(colliding_hitbox) << std::endl;
+                std::cout << boundaries_hitboxes[1]->is_colliding(colliding_hitbox) << std::endl;
+                std::cout << boundaries_hitboxes[2]->is_colliding(colliding_hitbox) << std::endl;
+                std::cout << boundaries_hitboxes[3]->is_colliding(colliding_hitbox) << std::endl; */
+            #endif
 
+            const int N = sizeof(collisions_area) / sizeof(float);
             #if defined TEST
                 for(auto valor : collisions_area){
                     std::cout << valor << " ";
@@ -206,6 +239,17 @@ struct Character : public MovingEntity{
             #endif
         } else this->moveLiberty.para_baixo = true;
     }
+
+    virtual void move(GLdouble deltaTime){
+        MovingEntity::move(deltaTime);
+
+        //Atualiza as boundaries
+        boundaries.limite_direito->transform = this->transform;
+        boundaries.limite_esquerdo->transform = this->transform;
+        boundaries.limite_superior->transform = this->transform;
+        boundaries.limite_inferior->transform = this->transform; 
+    }
+
 };
 
 struct Player : public Character{
@@ -230,18 +274,21 @@ struct Player : public Character{
             this->x_moveConfigurations.velocity = 0.0f;
         }
 
-        if (keyStatus[(int)('w')]){
-            this->y_moveConfigurations.velocity = velocity;
         #if defined TEST
-        } else if (keyStatus[(int)('s')]){
-            this->y_moveConfigurations.velocity = -velocity;
-        }else{
-            this->y_moveConfigurations.velocity = 0.0f;
-        }
+            if (keyStatus[(int)('w')]){
+                this->y_moveConfigurations.velocity = height*3/1000;
+                //std::cout << this->y_moveConfigurations.velocity << std::endl;
+            } else if (keyStatus[(int)('s')]){
+                this->y_moveConfigurations.velocity = -height*3/1000;
+            }else{
+                this->y_moveConfigurations.velocity = 0.0f;
+            }
         #else
-        } else {
-            this->y_moveConfigurations.velocity = -velocity;
-        }
+            if(keyStatus[(int)(' ')]){
+                this->y_moveConfigurations.velocity = height*3/1000;
+            } else {
+                this->y_moveConfigurations.velocity = -height*3/1000;;
+            }
         #endif
 
         this->move(deltaTime);
