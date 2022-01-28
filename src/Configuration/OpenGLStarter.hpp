@@ -14,6 +14,8 @@
 #define NUM_TECLAS_ASCII 256
 #define LEFT_CLICK 256
 #define RIGHT_CLICK 257
+#define MOUSE_X_COORD 258
+#define MOUSE_Y_COORD 259
 
 struct Mouse : public Entity{
     bool must_draw = false;
@@ -50,7 +52,7 @@ struct Mouse : public Entity{
 struct OpenGLStarter{
     GLdouble framerate = 0;
     OpenGLConfig openGLConfig;
-    int keyStatus[NUM_TECLAS_ASCII + 2]; // Teclas ascii + dois cliques do mouse
+    int keyStatus[NUM_TECLAS_ASCII + 2 + 2]; // Teclas ascii + dois cliques do mouse + duas coordenadas do mouse
     SceneTree sceneTree;
     Mouse* mouse;
     static OpenGLStarter* instance;
@@ -69,7 +71,7 @@ struct OpenGLStarter{
     void ResetKeyStatus(){
         int i;
         //Initialize keyStatus
-        for(i = 0; i < NUM_TECLAS_ASCII + 2; i++)
+        for(i = 0; i < NUM_TECLAS_ASCII + 2 + 2; i++)
             keyStatus[i] = 0; 
     }
 
@@ -124,7 +126,8 @@ struct OpenGLStarter{
         #endif
 
         instance->mouse->update_position_on_world(x - instance->openGLConfig.width/2, - y + instance->openGLConfig.height/2);
-
+        instance->keyStatus[MOUSE_X_COORD] = instance->mouse->transform.position.x;
+        instance->keyStatus[MOUSE_Y_COORD] = instance->mouse->transform.position.y;
         #if defined TEST
             // std::cout << "Mouse em (" << instance->mouse->transform.position.x << ", " << instance->mouse->transform.position.y << ")" << std::endl;
         #endif
