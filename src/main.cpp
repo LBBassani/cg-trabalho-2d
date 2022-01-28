@@ -30,8 +30,7 @@ int main(int argc, char *argv[]){
     #endif    
     
     OpenGLConfig openGLConfig = OpenGLConfig("Trabalho 2D",700, 700, 500, 500);
-    OpenGLStarter openGLStarter = OpenGLStarter(openGLConfig);
-    openGLStarter.sceneTree = sceneTree;
+    OpenGLStarter openGLStarter = OpenGLStarter(openGLConfig, sceneTree);
     openGLStarter.setInstance(&openGLStarter);
    
     openGLStarter.initGlut(argc, argv);
