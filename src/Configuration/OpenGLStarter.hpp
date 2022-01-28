@@ -15,23 +15,50 @@
 #define LEFT_CLICK 256
 #define RIGHT_CLICK 257
 
+struct Mouse : public Entity{
+    bool must_draw = false;
+    glm::vec3 color_on_left_click = {0.2f, 1.0f, 0.2f};
+    glm::vec3 color_on_right_click = {1.0f, 0.0f, 0.5f};
+    glm::vec3 normal_color = {1.0f, 1.0f, 1.0f};
+
+    Mouse(){
+        this->setNome("Mouse");
+        this->setColor(this->normal_color);
+        this->setShape(new Triangle(1.0f, 1.0f));
+        this->transform.eulerRotation.z = 45.0f;
+        this->is_movable = true;
+    }
+
+    virtual void draw(){ if (must_draw) Entity::draw(); } // Desenha se puder ser desenhado
+
+    virtual void update_position_on_world(int x, int y){
+        glm::vec4 position_on_world = glm::inverse(parent->transform.modelMatrix)*glm::vec4(x, y, 0.0f, 1.0f);
+        this->transform.position.x = position_on_world.x;
+        this->transform.position.y = position_on_world.y;
+    }
+
+    virtual void act(int* keyStatus, GLdouble){
+        if(keyStatus[(int) ('m')]) must_draw = !must_draw;
+        
+        if(keyStatus[LEFT_CLICK]) this->setColor(color_on_left_click);
+        else if(keyStatus[RIGHT_CLICK]) this->setColor(color_on_right_click);
+        else this->setColor(normal_color);
+        
+    }
+};
+
 struct OpenGLStarter{
     GLdouble framerate = 0;
     OpenGLConfig openGLConfig;
     int keyStatus[NUM_TECLAS_ASCII + 2]; // Teclas ascii + dois cliques do mouse
     SceneTree sceneTree;
-    Entity* mouse;
-    Shape* must_not_draw_mouse = new Triangle(1.0f, 1.0f);
+    Mouse* mouse;
     static OpenGLStarter* instance;
 
     OpenGLStarter(const OpenGLConfig &config, SceneTree sceneTree){
         this->openGLConfig = OpenGLConfig(config);
         this->sceneTree = sceneTree;
-        this->mouse = new Entity();
-        this->mouse->setNome("Mouse");
-        this->mouse->setShape(nullptr);
-        this->mouse->setColor({1.0f, 1.0f, 1.0f});
-        this->mouse->transform.eulerRotation.z = 45.0f;
+        this->mouse = new Mouse();
         this->sceneTree.root->addChild(this->mouse);
     }
 
@@ -42,7 +69,7 @@ struct OpenGLStarter{
     void ResetKeyStatus(){
         int i;
         //Initialize keyStatus
-        for(i = 0; i < 256; i++)
+        for(i = 0; i < NUM_TECLAS_ASCII + 2; i++)
             keyStatus[i] = 0; 
     }
 
@@ -59,11 +86,6 @@ struct OpenGLStarter{
         glutPostRedisplay();
     }
 
-    void drawMouse(){
-        this->mouse->updateSelfAndChildren();
-        this->mouse->draw();
-    }
-
     static void idle(void){
         static GLdouble prevTime = glutGet(GLUT_ELAPSED_TIME);
         GLdouble curTime, deltaTime;
@@ -78,16 +100,6 @@ struct OpenGLStarter{
     static void keyPress(unsigned char key, int, int){
         if( key == 27 )
             exit(0);
-        
-        if( key == 'm') {
-            if(instance->must_not_draw_mouse) {
-                instance->mouse->setShape(instance->must_not_draw_mouse);
-                instance->must_not_draw_mouse = nullptr;
-            }else{
-                instance->must_not_draw_mouse = instance->mouse->getShape();
-                instance->mouse->setShape(nullptr);
-            }
-        }
 
         instance->keyStatus[(int) tolower(key)] = 1;
     }
@@ -101,8 +113,8 @@ struct OpenGLStarter{
             else instance->keyStatus[RIGHT_CLICK] = 0;                  // On release
         }
         #if defined TEST
-            if(instance->keyStatus[LEFT_CLICK]) std::cout << "Clique esquerdo!!" << std::endl;
-            if(instance->keyStatus[RIGHT_CLICK]) std::cout << "Clique direito!!" << std::endl;
+            //if(instance->keyStatus[LEFT_CLICK]) std::cout << "Clique esquerdo!!" << std::endl;
+            //if(instance->keyStatus[RIGHT_CLICK]) std::cout << "Clique direito!!" << std::endl;
         #endif
     }
 
@@ -111,9 +123,7 @@ struct OpenGLStarter{
             // std::cout << "Mouse em (" << instance->keyStatus[MOUSE_X_COORD] << ", " << instance->keyStatus[MOUSE_Y_COORD] << ")" << std::endl;
         #endif
 
-        glm::vec4 position_on_scene = glm::inverse(instance->sceneTree.root->transform.modelMatrix)*glm::vec4(x - instance->openGLConfig.width/2, - y + instance->openGLConfig.height/2, 0.0f, 1.0f);
-        instance->mouse->transform.position.x = position_on_scene.x;
-        instance->mouse->transform.position.y = position_on_scene.y;
+        instance->mouse->update_position_on_world(x - instance->openGLConfig.width/2, - y + instance->openGLConfig.height/2);
 
         #if defined TEST
             // std::cout << "Mouse em (" << instance->mouse->transform.position.x << ", " << instance->mouse->transform.position.y << ")" << std::endl;
