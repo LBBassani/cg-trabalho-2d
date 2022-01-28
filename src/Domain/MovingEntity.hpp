@@ -22,6 +22,7 @@ struct MovingEntity : public Entity{
 
 
     float velocity = 0.0f;
+    bool can_jump = true;
     MoveConfigurations x_moveConfigurations;
     MoveConfigurations y_moveConfigurations;
     MoveConfigurations angular_moveConfigurations;
@@ -43,7 +44,7 @@ struct MovingEntity : public Entity{
         float   new_x_position = this->transform.position.x + x_moveConfigurations.velocity * deltaTime,
                 new_y_position = this->transform.position.y + y_moveConfigurations.velocity * deltaTime;
         
-        this->last_position.x = this->transform.position.x;
+        
         // Atualiza a posição em x se estiver nos limites e estiver se movendo em uma direção permitida
         if (    new_x_position > x_moveConfigurations.min                                   // Posição é maior que a mínima permitida
                 && new_x_position < x_moveConfigurations.max                                // Posiçao é menor que a máxima permitida
@@ -55,7 +56,7 @@ struct MovingEntity : public Entity{
                 this->transform.position.x = new_x_position;
             }
         
-        this->last_position.y = this->transform.position.y;
+        
         // Atualiza a posição em y se estiver nos limites e estiver se movendo em uma direção permitida
         if (    new_y_position > y_moveConfigurations.min                                   // Posição é maior que a mínima permitida
                 && new_y_position < y_moveConfigurations.max                                // Posiçao é menor que a máxima permitida

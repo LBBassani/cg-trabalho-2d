@@ -21,7 +21,6 @@ struct Entity : public Model
     bool is_movable = false;
     bool is_player = false; 
     MoveLiberty moveLiberty;
-    glm::vec3 last_position = {0.0f, 0.0f, 0.0f};
 
     Transform transform;
 
