@@ -156,14 +156,14 @@ struct ParserSVG{
     static glm::vec3 getColorCode(std::string colorName){
         glm::vec3 color;
 
-        /* if (colorName == "black")
+        if (colorName == "black")
             color = glm::vec3(0.0f, 0.0f, 0.0f);
              
-        else */ if(colorName == "blue")
-            color = glm::vec3(0.0f, 0.0f, 1.0f);
+        else if(colorName == "blue")
+            color = glm::vec3(0.2f, 0.5f, 1.0f);
 
         else if(colorName == "green")
-            color = glm::vec3(0.0f, 1.0f, 0.0f);
+            color = glm::vec3(0.0f, 0.2f, 0.0f);
             
         else if(colorName == "red")
             color = glm::vec3(1.0f, 0.0f, 0.0f);

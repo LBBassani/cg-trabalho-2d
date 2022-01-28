@@ -17,10 +17,10 @@ struct CharacterConfigurations{
     float braco_height = 0.05;
     float meia_perna = 0.15;
 
-    glm::vec3 cabeca_color = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 tronco_color = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 braco_color = glm::vec3(1.0f, 1.0f, 0.0f);
-    glm::vec3 perna_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 cabeca_color = glm::vec3(0.0f, 0.8f, 0.2f);
+    glm::vec3 tronco_color = glm::vec3(0.0f, 0.8f, 0.2f);
+    glm::vec3 braco_color = glm::vec3(1.0f, 1.0f, 0.2f);
+    glm::vec3 perna_color = glm::vec3(1.0f, 0.0f, 0.2f);
 };
 
 struct Boundaries{
