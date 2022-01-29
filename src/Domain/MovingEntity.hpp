@@ -64,9 +64,6 @@ struct MovingEntity : public Entity{
                     || (y_moveConfigurations.velocity < 0.0f && moveLiberty.para_baixo)     // Estar se movendo pra baixo (velocity negativo) e ter liberdade pra isso
                 )
             ){
-                #if defined TEST
-                //std::cout << this->last_position.y << std::endl;
-                #endif
                 this->transform.position.y = new_y_position;
             }
         
