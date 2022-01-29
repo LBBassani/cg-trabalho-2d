@@ -18,7 +18,7 @@
 #define MOUSE_Y_COORD 259
 
 struct Mouse : public Entity{
-    bool must_draw = false;
+    bool must_draw = true;
     glm::vec3 color_on_left_click = {0.2f, 1.0f, 0.2f};
     glm::vec3 color_on_right_click = {1.0f, 0.0f, 0.5f};
     glm::vec3 normal_color = {1.0f, 1.0f, 1.0f};
