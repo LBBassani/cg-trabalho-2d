@@ -107,6 +107,7 @@ struct OpenGLStarter{
     }
 
     static void idle(void){
+        if(instance->keyStatus[(int) 'r']) instance->makeWorld();
         static GLdouble prevTime = glutGet(GLUT_ELAPSED_TIME);
         GLdouble curTime, deltaTime;
         curTime = glutGet(GLUT_ELAPSED_TIME);
@@ -120,9 +121,6 @@ struct OpenGLStarter{
     static void keyPress(unsigned char key, int, int){
         if( key == 27 )
             exit(0);
-        
-        if (key == 'r')
-            instance->makeWorld();
 
         instance->keyStatus[(int) tolower(key)] = 1;
     }
