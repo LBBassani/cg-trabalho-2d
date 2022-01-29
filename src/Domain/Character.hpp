@@ -9,6 +9,7 @@
 #include "HitboxMapping.hpp"
 #include "MovingEntity.hpp"
 #include "Shape.hpp"
+#include "Shot.hpp"
 
 #define MOUSE_LEFT_CLICK 256
 #define MOUSE_RIGHT_CLICK 257
@@ -80,7 +81,7 @@ struct Braco : public MovingEntity{
         glm::vec4   braco_origem = {this->transform.position.x, this->transform.position.y + height/2, 0.0f, 1.0f},
                     target = {target_position.x, target_position.y, 0.0f, 1.0f};
         
-        braco_origem = /* this->transform.modelMatrix* */braco_origem;
+        braco_origem = this->transform.modelMatrix*braco_origem;
         
         float   angle_1 = atan2(target.y - braco_origem.y, target.x - braco_origem.x)*180/glm::pi<float>(),
                 angle_2 = this->transform.eulerRotation.z,
@@ -104,10 +105,13 @@ struct Character : public MovingEntity{
     CharacterConfigurations config;
     Boundaries boundaries;
     Braco* braco;
+    Shot* shot = nullptr;
+    int shot_cooldown = 1000;
     
     bool can_jump = true;
 
     Character(float height = Character::original_height, CharacterConfigurations config = CharacterConfigurations()){
+        this->is_character = true;
         this->height = height;
         this->config = config;
         float width = height*config.tronco_width;
@@ -209,24 +213,28 @@ struct Character : public MovingEntity{
         boundaries.limite_direito = new Entity();
         boundaries.limite_direito->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_direito.x, -height/2));
         boundaries.limite_direito->setNome("limite direito");
+        boundaries.limite_direito->is_movable = true;
         this->addChild(boundaries.limite_direito);
 
         boundaries.dist_esquerdo.x = -width/2 - boundary_size/2;
         boundaries.limite_esquerdo = new Entity();
         boundaries.limite_esquerdo->setHitbox(new Rect(boundary_size, height - boundary_size), glm::vec2(boundaries.dist_esquerdo.x, -height/2));
         boundaries.limite_esquerdo->setNome("limite esquerdo");
+        boundaries.limite_esquerdo->is_movable = true;
         this->addChild(boundaries.limite_esquerdo);
 
         boundaries.dist_inferior.y = -boundary_size;
         boundaries.limite_inferior = new Entity();
         boundaries.limite_inferior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_inferior.y -height/2));
         boundaries.limite_inferior->setNome("limite inferior");
+        boundaries.limite_inferior->is_movable = true;
         this->addChild(boundaries.limite_inferior);
 
         boundaries.dist_superior.y = height;
         boundaries.limite_superior = new Entity();
         boundaries.limite_superior->setHitbox(new Rect(width - boundary_size, boundary_size), glm::vec2(0.0f, boundaries.dist_superior.y -height/2));
         boundaries.limite_superior->setNome("limite superior");
+        boundaries.limite_superior->is_movable = true;
         this->addChild(boundaries.limite_superior);
     }
 
@@ -312,6 +320,14 @@ struct Character : public MovingEntity{
         } else this->moveLiberty.para_baixo = true;
     }
 
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        MovingEntity::act(keyStatus,  deltaTime);
+
+        if(keyStatus[(int) 'p']) return;
+
+        this->shot_cooldown -= deltaTime;
+    }
+
     virtual void move(GLdouble deltaTime){
         MovingEntity::move(deltaTime);
 
@@ -320,6 +336,22 @@ struct Character : public MovingEntity{
             || (this->y_moveConfigurations.velocity < 0 && moveLiberty.para_baixo)                                       // Se estava caindo e não terminou de cair ainda
         ) 
                 this->can_jump = false; 
+    }
+
+    virtual void do_shot(GLdouble deltaTime){
+        if (this->shot_cooldown > 0) return;
+
+        this->shot_cooldown = 1000;
+        if(this->is_player) this->shot = new PlayerShot(this->braco->height);
+        else this->shot = new EnemyShot(this->braco->height);
+
+        this->shot->transform.eulerRotation.z = this->braco->transform.eulerRotation.z;
+        this->shot->transform.position.x = this->transform.position.x;
+        this->shot->shape_offset = {this->braco->width + this->braco->height, this->braco->height};
+        this->shot->hitbox_offset = {this->braco->width - this->braco->height, this->braco->height};
+        this->shot->transform.position.y = this->transform.position.y;
+        this->shot->x_moveConfigurations.velocity = 2*this->velocity;
+        this->parent->addChild(this->shot);
     }
 
 };
@@ -357,6 +389,8 @@ struct Player : public Character{
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
+        Character::act(keyStatus, deltaTime);
+
         if (keyStatus[(int)('a')]){
             this->x_moveConfigurations.velocity = -velocity;
         } else if (keyStatus[(int)('d')]){
@@ -382,12 +416,20 @@ struct Player : public Character{
             }
         #endif
 
+            if(keyStatus[MOUSE_LEFT_CLICK]){
+                this->do_shot(deltaTime);
+            }
+
         this->move(deltaTime);
 
         glm::vec4 real_player_coords = this->transform.modelMatrix*glm::vec4(this->transform.position.x,this->transform.position.y, 0.0f, 1.0f);
         
         keyStatus[PLAYER_X_COORD] = (int) real_player_coords.x;
         keyStatus[PLAYER_Y_COORD] = (int) -real_player_coords.y;
+
+        #if defined TEST
+            //std::cout << "Player no ponto: " << keyStatus[PLAYER_X_COORD] << ", " << keyStatus[PLAYER_Y_COORD] << std::endl;
+        #endif
     }
 
 };
