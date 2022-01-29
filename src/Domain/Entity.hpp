@@ -19,6 +19,7 @@ struct Entity : public Model
 {
 
     bool is_movable = false;
+    bool is_character = false;
     bool is_player = false; 
     MoveLiberty moveLiberty;
 
