@@ -90,7 +90,6 @@ struct SceneTree{
         this->updateHitboxMapping();
 
         for(auto dynamic_hitbox : dynamic_hitbox_mapping){
-            if (!dynamic_hitbox.entity_ptr->is_player) continue;
 
             std::list<HitboxMapping> collisions;
             
