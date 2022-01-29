@@ -52,7 +52,6 @@ struct Braco : public MovingEntity{
 
     Braco(){
         this->angular_moveConfigurations.velocity = 0.1f;
-        this->transform.pivot = { width/2, -height/2, 0.0f};
     }
     
     virtual void act(int* keyStatus, GLdouble deltaTime){
@@ -74,8 +73,7 @@ struct Braco : public MovingEntity{
     virtual void move(GLdouble deltaTime){
         
         // Coloca o braço pra rotacionar até o mouse
-        glm::vec4   braco_origem = {this->transform.position.x - width/2, this->transform.position.y + height/2, 0.0f, 1.0f},
-                    braco_final = {this->transform.position.x + width/2, this->transform.position.y + height/2, 0.0f, 1.0f},
+        glm::vec4   braco_origem = {this->transform.position.x, this->transform.position.y + height/2, 0.0f, 1.0f},
                     target = {target_position.x, target_position.y, 0.0f, 1.0f};
         
         braco_origem = this->transform.modelMatrix*braco_origem;
@@ -142,9 +140,8 @@ struct Character : public MovingEntity{
         this->braco->height = height*config.braco_height;
         Rect* braco_shape = new Rect(this->braco->width, this->braco->height);
         braco->setNome("braço");
-        braco->setShape(braco_shape);
+        braco->setShape(braco_shape, {this->braco->width/2, 0.0f});
         braco->setColor(config.braco_color);
-        braco->transform.position.x = this->braco->width/2;
         braco->min_angle = -45.0f;
         braco->max_angle = 45.0f;
 
