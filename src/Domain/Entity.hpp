@@ -27,6 +27,13 @@ struct Entity : public Model
     std::list<Entity*> children;
     Entity* parent = nullptr;
 
+    ~Entity(){
+        for (auto child : children){
+            if(child) delete child;
+            child = nullptr;
+        }
+    }
+
     void addChild(Entity* entity){
         children.emplace_back(entity);
         children.back()->parent = this;

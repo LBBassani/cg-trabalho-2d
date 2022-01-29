@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "OpenGLConfig.hpp"
+#include "ScenarioConfig.hpp"
 #include "../Domain/SceneTree.hpp"
 #include "../Domain/Shape.hpp"
 
@@ -16,6 +17,8 @@
 #define RIGHT_CLICK 257
 #define MOUSE_X_COORD 258
 #define MOUSE_Y_COORD 259
+#define PLAYER_X_COORD 260
+#define PLAYER_Y_COORD 261
 
 struct Mouse : public Entity{
     bool must_draw = true;
@@ -52,16 +55,31 @@ struct Mouse : public Entity{
 struct OpenGLStarter{
     GLdouble framerate = 0;
     OpenGLConfig openGLConfig;
-    int keyStatus[NUM_TECLAS_ASCII + 2 + 2]; // Teclas ascii + dois cliques do mouse + duas coordenadas do mouse
+    int keyStatus[NUM_TECLAS_ASCII + 2 + 2 + 2]; // Teclas ascii + dois cliques do mouse + duas coordenadas do mouse + duas coordenadas do boneco
     SceneTree sceneTree;
+    std::string sceneName;
     Mouse* mouse;
     static OpenGLStarter* instance;
 
-    OpenGLStarter(const OpenGLConfig &config, SceneTree sceneTree){
+    OpenGLStarter(const OpenGLConfig &config, std::string fileName){
         this->openGLConfig = OpenGLConfig(config);
-        this->sceneTree = sceneTree;
+        this->sceneName = fileName;
+        this->makeWorld();
+    }
+
+    virtual void makeWorld(){
+        this->sceneTree.cleanSceneTree();
+        this->sceneTree.root = ParserSVG::parseSVG(this->sceneName);
         this->mouse = new Mouse();
         this->sceneTree.root->addChild(this->mouse);
+        this->sceneTree.root->updateSelfAndChildren();
+        this->sceneTree.updateHitboxMapping();
+
+        #if defined TEST
+            sceneTree.print();
+            //return 0;
+        #endif
+
     }
 
     static void setInstance(OpenGLStarter* openGLStarter){
@@ -102,6 +120,9 @@ struct OpenGLStarter{
     static void keyPress(unsigned char key, int, int){
         if( key == 27 )
             exit(0);
+        
+        if (key == 'r')
+            instance->makeWorld();
 
         instance->keyStatus[(int) tolower(key)] = 1;
     }

@@ -14,6 +14,8 @@
 #define MOUSE_RIGHT_CLICK 257
 #define MOUSE_X_COORD 258
 #define MOUSE_Y_COORD 259
+#define PLAYER_X_COORD 260
+#define PLAYER_Y_COORD 261
 
 struct CharacterConfigurations{
     float cabeca = 0.3;
@@ -49,6 +51,7 @@ struct Braco : public MovingEntity{
     glm::vec2 target_position = {0.0f, 0.0f};
     float height, width;
     float max_angle, min_angle;
+    bool player_braco = false;
 
     Braco(){
         this->angular_moveConfigurations.velocity = 0.1f;
@@ -56,7 +59,8 @@ struct Braco : public MovingEntity{
     
     virtual void act(int* keyStatus, GLdouble deltaTime){
         
-        this->target_position = {keyStatus[MOUSE_X_COORD], keyStatus[MOUSE_Y_COORD]};
+        if(this->player_braco) this->target_position = {keyStatus[MOUSE_X_COORD], keyStatus[MOUSE_Y_COORD]};
+        else this->target_position = {keyStatus[PLAYER_X_COORD], keyStatus[PLAYER_Y_COORD]};
 
         this->move(deltaTime);
     }
@@ -76,7 +80,7 @@ struct Braco : public MovingEntity{
         glm::vec4   braco_origem = {this->transform.position.x, this->transform.position.y + height/2, 0.0f, 1.0f},
                     target = {target_position.x, target_position.y, 0.0f, 1.0f};
         
-        braco_origem = this->transform.modelMatrix*braco_origem;
+        braco_origem = /* this->transform.modelMatrix* */braco_origem;
         
         float   angle_1 = atan2(target.y - braco_origem.y, target.x - braco_origem.x)*180/glm::pi<float>(),
                 angle_2 = this->transform.eulerRotation.z,
@@ -85,7 +89,7 @@ struct Braco : public MovingEntity{
         float new_angle = this->transform.eulerRotation.z + signal*angular_moveConfigurations.velocity*deltaTime;
 
         #if defined TEST
-            std::cout << "Angulo calculado: " << angle_2 << ", Angulo real: " << this->transform.eulerRotation.z << std::endl;
+            //std::cout << "Angulo calculado: " << angle_2 << ", Angulo real: " << this->transform.eulerRotation.z << std::endl;
             //std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
         #endif
 
@@ -158,6 +162,8 @@ struct Character : public MovingEntity{
         coxa_dir->transform.position.y = - height*config.tronco_height/2;
         coxa_dir->transform.eulerRotation.z = 180.0f;
 
+        perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
+
         Entity* canela_dir = new RotatingRect();
         canela_dir->setNome("canela direita");
         canela_dir->setShape(perna_shape);
@@ -169,12 +175,17 @@ struct Character : public MovingEntity{
         this->addChild(coxa_dir);
 
         // Monta a perna esquerda
+
+        perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
+        
         Entity* coxa_esq = new RotatingRect();
         coxa_esq->setNome("coxa esquerda");
         coxa_esq->setShape(perna_shape);
         coxa_esq->setColor(config.perna_color);
         coxa_esq->transform.position.y = - height*config.tronco_height/2;
         coxa_esq->transform.eulerRotation.z = 180.0f;
+
+        perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
         Entity* canela_esq = new RotatingRect();
         canela_esq->setNome("canela esquerda");
@@ -318,6 +329,7 @@ struct Player : public Character{
 
     Player(float height = Character::original_height) : Character(height) {
         this->is_player = true;
+        this->braco->player_braco = true;
         this->velocity = 0.02f;
         this->x_moveConfigurations.max = 1000.0f;
         this->y_moveConfigurations.max = 500.0f;
@@ -371,6 +383,11 @@ struct Player : public Character{
         #endif
 
         this->move(deltaTime);
+
+        glm::vec4 real_player_coords = this->transform.modelMatrix*glm::vec4(this->transform.position.x,this->transform.position.y, 0.0f, 1.0f);
+        
+        keyStatus[PLAYER_X_COORD] = (int) real_player_coords.x;
+        keyStatus[PLAYER_Y_COORD] = (int) -real_player_coords.y;
     }
 
 };

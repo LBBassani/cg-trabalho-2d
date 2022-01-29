@@ -27,6 +27,15 @@ struct Model{
     virtual void setHitbox(Shape *hitbox, glm::vec2 hitbox_offset = {0.0f, 0.0f}) { this->hitbox = hitbox; this->hitbox_offset = hitbox_offset; };
     virtual glm::vec2 getHitboxOffset(){ return hitbox_offset; };
 
+    ~Model(){
+        #if defined TEST
+            std::cout << "Deletando " << this->nome << std::endl;
+        #endif
+        if (shape) delete shape;
+        if (hitbox && shape != hitbox) delete hitbox;
+        shape = hitbox = nullptr;
+    }
+
     virtual void draw(){
         glColor3f(color.x, color.y, color.z);
         glTranslatef(shape_offset.x, shape_offset.y, 0.0f);

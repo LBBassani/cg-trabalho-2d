@@ -16,21 +16,8 @@
 int main(int argc, char *argv[]){
 
     std::string arquivo("../scenario/arena_teste.svg");
-    SceneTree sceneTree;
-    sceneTree.root = ParserSVG::parseSVG(arquivo);
-
-    sceneTree.root->updateSelfAndChildren();
-    sceneTree.updateHitboxMapping();
-
-    #if defined TEST
-
-    sceneTree.print();
-    //return 0;
-    
-    #endif    
-    
     OpenGLConfig openGLConfig = OpenGLConfig("Trabalho 2D",700, 700, 500, 500);
-    OpenGLStarter openGLStarter = OpenGLStarter(openGLConfig, sceneTree);
+    OpenGLStarter openGLStarter = OpenGLStarter(openGLConfig, arquivo);
     openGLStarter.setInstance(&openGLStarter);
    
     openGLStarter.initGlut(argc, argv);

@@ -6,14 +6,19 @@
 #include "HitboxMapping.hpp"
 
 struct SceneTree{
-    Entity* root;
+    Entity* root = nullptr;
     std::list<HitboxMapping> static_hitbox_mapping;
 
     void updateHitboxMapping(){
         bool moving_cond = false; // apenas entidades que não se movem
         static_hitbox_mapping = hitboxMappingList(moving_cond);
     }
-    
+
+    virtual void cleanSceneTree(){
+        if(root) delete root;
+        static_hitbox_mapping.clear();
+    }
+
     std::list<HitboxMapping> hitboxMappingList(bool moving_cond){
         std::list<Entity*> entities;
         root->flattenTree(&entities);
