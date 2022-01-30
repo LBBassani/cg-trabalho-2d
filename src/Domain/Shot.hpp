@@ -4,6 +4,7 @@
 #include "../Third-Party-Libs/glm/glm.hpp"
 
 #include "Shape.hpp"
+#include "Text.hpp"
 #include "MovingEntity.hpp"
 #include "HitboxMapping.hpp"
 
@@ -79,6 +80,11 @@ struct EnemyShot : public Shot{
     virtual bool shot(HitboxMapping hitbox){
         if(hitbox.entity_ptr->is_character && hitbox.entity_ptr->is_player) {
             hitbox.entity_ptr->parent->children.remove(hitbox.entity_ptr);
+            Subtext* sub = new Subtext("Press r to restart");
+            Text* text = new Text("Game over DX");
+            text->addChild(sub);
+            text->set_can_show(true);
+            this->parent->addChild(text);
             return true;
         }
         return false;
