@@ -66,9 +66,13 @@ struct OpenGLStarter{
         this->openGLConfig = OpenGLConfig(config);
         this->sceneName = fileName;
         this->makeWorld();
-        /* Timed_Text* t = new Timed_Text("Ohayo", 300);
-        this->sceneTree.root->addChild(t);
-        t->set_can_show(true); */
+        Cascading_Timed_Text* t_1 = new Cascading_Timed_Text();
+        Timed_Text* t_2 = new Timed_Text("Good morning");
+        Subtext* t_3 = new Subtext("world");
+        t_2->addChild(t_3);
+        t_1->addChild(t_2);
+        this->sceneTree.root->addChild(t_1);
+        t_1->set_can_show(true);
     }
 
     virtual void makeWorld(){

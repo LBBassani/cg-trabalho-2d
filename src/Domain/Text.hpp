@@ -41,6 +41,11 @@ struct Text : public Entity{
 
     virtual void set_can_show(bool can_show){
         this->can_show = can_show;
+
+        #if defined TEST
+            if(can_show) std::cout << this->getNome() << " can show " << std::endl;
+        #endif 
+
         for (auto child : children){
             if(Text* child_text = dynamic_cast<Text*>(child)){
                 child_text->set_can_show(can_show);
@@ -110,15 +115,50 @@ struct Timed_Text : public Text{
     Timed_Text(std::string text = "Ohayo Sekai", int timer_value = 1000.0f) : Text(text){
         this->timer = timer_value;
         this->timer_initial_value = timer_value;
+        this->is_movable = true;
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
         if(this->can_show) timer -= deltaTime;
+        
+        #if defined TEST
+            //std::cout << timer << std::endl;
+        #endif
+        
         if(timer <= 0){
-            this->can_show = false;
+            this->set_can_show(false);
             this->timer = this->timer_initial_value; 
         }
     }
+};
+
+struct Cascading_Timed_Text : public Timed_Text{
+
+    virtual void set_can_show(bool can_show){
+        this->can_show = can_show;
+    };
+
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        bool old_can_show = this->can_show;
+        if(!old_can_show) return;
+
+        Timed_Text::act(keyStatus, deltaTime);
+
+        bool new_can_show = this->can_show;
+        if(old_can_show != new_can_show){
+            Timed_Text::set_can_show(true);
+            this->set_can_show(new_can_show);
+        }
+    }
+
+    virtual void draw(){
+        if(prepare_drawing()) Timed_Text::draw();
+
+        for(auto child : children){
+            child->draw();
+        }
+    }
+
 };
 
 #endif
