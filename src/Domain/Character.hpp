@@ -40,6 +40,8 @@ struct Boundaries{
 struct RotatingRect : public MovingEntity{
 
     bool can_move = false;
+    bool is_jumping = false;
+    float jumping_rotation = 0.0f;
     float original_rotation = 0.0f;
 
     RotatingRect(float velocity = 0.2f){
@@ -66,9 +68,29 @@ struct RotatingRect : public MovingEntity{
         }
     }
 
+    virtual void set_is_jumping(bool is_jumping){
+        bool old_is_jumping = this->is_jumping;
+        if(old_is_jumping == is_jumping) return;
+
+        this->is_jumping = is_jumping;
+        for(auto entity : children){
+            if(RotatingRect* child = dynamic_cast<RotatingRect*>(entity)){
+                child->set_is_jumping(is_jumping);
+            }
+        }
+        this->reset();
+    }
+
     virtual void act(int* keyStatus, GLdouble deltaTime){
         MovingEntity::act(keyStatus, deltaTime);
-        if(is_paused || !can_move) return;
+        if(is_paused) return;
+
+        if(is_jumping){
+            this->transform.eulerRotation.z = this->jumping_rotation;
+            return;
+        }
+
+        if(!can_move) return;
 
         bool chegou_limite = (this->transform.eulerRotation.z + this->angular_moveConfigurations.velocity*deltaTime >= this->angular_moveConfigurations.max) 
                             || (this->transform.eulerRotation.z + this->angular_moveConfigurations.velocity*deltaTime <= this->angular_moveConfigurations.min);
@@ -204,6 +226,7 @@ struct Character : public MovingEntity{
         coxa_dir->setColor(config.perna_color);
         coxa_dir->transform.position.y = - height*config.tronco_height/2;
         coxa_dir->original_rotation = 180.0f;
+        coxa_dir->jumping_rotation = 250.0f;
         coxa_dir->angular_moveConfigurations.max = 240.0f;
         coxa_dir->angular_moveConfigurations.min = 120.0f;
 
@@ -214,6 +237,7 @@ struct Character : public MovingEntity{
         canela_dir->setShape(perna_shape);
         canela_dir->setColor(config.perna_color);
         canela_dir->transform.position.y = height*config.meia_perna;
+        canela_dir->jumping_rotation = -70.0f;
         canela_dir->angular_moveConfigurations.max = 0.0f;
         canela_dir->angular_moveConfigurations.min = -60.0f;
         canela_dir->angular_moveConfigurations.velocity = -canela_dir->angular_moveConfigurations.velocity/2;
@@ -232,6 +256,7 @@ struct Character : public MovingEntity{
         coxa_esq->setColor(config.perna_color);
         coxa_esq->transform.position.y = - height*config.tronco_height/2;
         coxa_esq->original_rotation = 180.0f;
+        coxa_esq->jumping_rotation = 190.0f;
         coxa_esq->angular_moveConfigurations.max = 240.0f;
         coxa_esq->angular_moveConfigurations.min = 120.0f;
         coxa_esq->angular_moveConfigurations.velocity = -coxa_esq->angular_moveConfigurations.velocity;
@@ -368,11 +393,17 @@ struct Character : public MovingEntity{
         if (collision[3]) {
             this->moveLiberty.para_baixo = false;
             this->can_jump = true;
+            this->perna_1->set_is_jumping(false);
+            this->perna_2->set_is_jumping(false);
             this->y_moveConfigurations.max = this->transform.position.y + 3*height;
             #if defined TEST
                 //std::cout << "Não pode mover pra baixo" << std::endl;
             #endif
-        } else this->moveLiberty.para_baixo = true;
+        } else {
+            this->moveLiberty.para_baixo = true;
+            this->perna_1->set_is_jumping(true);
+            this->perna_2->set_is_jumping(true);
+        }
 
         for (auto boundary : boundaries_hitboxes){
             delete boundary;
@@ -404,8 +435,9 @@ struct Character : public MovingEntity{
         if(
             this->transform.position.y + this->y_moveConfigurations.velocity*deltaTime >= this->y_moveConfigurations.max // Se chegou na altura máxima ou
             || (this->y_moveConfigurations.velocity < 0 && moveLiberty.para_baixo)                                       // Se estava caindo e não terminou de cair ainda
-        ) 
-                this->can_jump = false; 
+        ){ 
+                this->can_jump = false;
+        }
     }
 
     virtual void do_shot(GLdouble deltaTime){
@@ -481,6 +513,8 @@ struct Player : public Character{
         #else
             if(keyStatus[MOUSE_RIGHT_CLICK] && this->can_jump){
                 this->y_moveConfigurations.velocity = height*3/1000;
+                this->perna_1->set_is_jumping(true);
+                this->perna_2->set_is_jumping(true);
             } else {
                 this->y_moveConfigurations.velocity = -height*3/1000;;
             }
