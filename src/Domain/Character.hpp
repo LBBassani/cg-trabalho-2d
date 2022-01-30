@@ -101,6 +101,7 @@ struct Character : public MovingEntity{
     Braco* braco;
     Shot* shot = nullptr;
     int shot_cooldown = 1000;
+    int shot_cooldown_original_value = 1000;
     
     bool can_jump = true;
 
@@ -341,7 +342,7 @@ struct Character : public MovingEntity{
     virtual void do_shot(GLdouble deltaTime){
         if (this->shot_cooldown > 0 || is_paused) return;
 
-        this->shot_cooldown = 1000;
+        this->shot_cooldown = shot_cooldown_original_value;
         if(this->is_player) this->shot = new PlayerShot(this->braco->height);
         else this->shot = new EnemyShot(this->braco->height);
 
@@ -438,6 +439,7 @@ struct Enemy : public Character{
     bool can_move = false;
     int move_cooldown;
     int original_move_cooldown_value;
+    int n = 1;
 
     Enemy(float height = Character::original_height, int original_move_cooldown = 3000) : Character(height){
         this->velocity = 0.015f;
@@ -547,6 +549,13 @@ struct Enemy : public Character{
 
     }
 
+    virtual void setNome(std::string nome){
+        Character::setNome(nome);
+        n = std::stoi(first_numberstring(this->getNome()));
+        while(n > 10) n /= 10;
+        shot_cooldown_original_value = std::min(10000 - std::max(1000*n + n*100 + n*20 + n*5, 2500), 7450);
+    }
+
     virtual void act(int* keyStatus, GLdouble deltaTime){ 
 
         Character::act(keyStatus, deltaTime);
@@ -563,9 +572,6 @@ struct Enemy : public Character{
         #if defined TEST
             //if(this->getNome() == "Enemy 1") std::cout << move_cooldown << std::endl;
         #endif
-        
-        int n = std::stoi(first_numberstring(this->getNome()));
-        while(n > 10) n /= 10;
 
         bool chegou_limite = (this->transform.position.x + this->x_moveConfigurations.velocity*deltaTime >= this->x_moveConfigurations.max) 
                             || (this->transform.position.x + this->x_moveConfigurations.velocity*deltaTime <= this->x_moveConfigurations.min);
@@ -587,7 +593,7 @@ struct Enemy : public Character{
         #endif
 
 
-        //if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0) this->do_shot(deltaTime);
+        if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0) this->do_shot(deltaTime);
 
     };
 
