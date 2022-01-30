@@ -540,7 +540,9 @@ struct Player : public Character{
 
 struct Enemy : public Character{
     bool can_move = false;
+    int can_move_cooldown = 500;
     bool can_shot = false;
+    int can_shot_cooldown = 500;
     int move_cooldown;
     int original_move_cooldown_value;
     int n = 1;
@@ -664,13 +666,20 @@ struct Enemy : public Character{
 
         Character::act(keyStatus, deltaTime);
 
-        if(keyStatus[(int) ('c')]) {
+        can_move_cooldown -= deltaTime;
+
+        if(keyStatus[(int) ('c')] && can_move_cooldown <= 0) {
+            can_move_cooldown = 500;
             this->can_move = !this->can_move;
-            this->perna_1->can_move = this->can_move;
-            this->perna_2->can_move = this->can_move;
+            this->perna_1->set_can_move(this->can_move);
+            this->perna_2->set_can_move(this->can_move);
         }
 
-        if(keyStatus[(int) ('z')]) this->can_shot = !this->can_shot;
+        can_shot_cooldown -= deltaTime;
+        if(keyStatus[(int) ('z')] && can_shot_cooldown <= 0) {
+            can_shot_cooldown = 500;
+            this->can_shot = !this->can_shot;
+        }
 
         if(is_paused || !this->can_move) return;
 
