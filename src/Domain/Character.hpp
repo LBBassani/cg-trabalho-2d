@@ -38,7 +38,32 @@ struct Boundaries{
 };
 
 struct RotatingRect : public MovingEntity{
-    virtual void act(int* keyStatus, GLdouble deltaTime){ };
+
+    bool can_move = false;
+    float original_rotation = 0.0f;
+
+    RotatingRect(float velocity = 0.2f){
+        this->velocity = velocity;
+        this->angular_moveConfigurations.velocity = velocity;
+        this->is_movable = true;
+    }
+
+    virtual void reset(){
+        this->transform.eulerRotation.z = this->original_rotation;
+    }
+
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        MovingEntity::act(keyStatus, deltaTime);
+        if(is_paused || !can_move) return;
+
+        bool chegou_limite = (this->transform.eulerRotation.z + this->angular_moveConfigurations.velocity*deltaTime >= this->angular_moveConfigurations.max) 
+                            || (this->transform.eulerRotation.z + this->angular_moveConfigurations.velocity*deltaTime <= this->angular_moveConfigurations.min);
+
+        if(chegou_limite)
+            this->angular_moveConfigurations.velocity = -this->angular_moveConfigurations.velocity;
+
+        this->rotate(deltaTime);
+    };
 };
 
 struct Braco : public MovingEntity{
@@ -96,9 +121,14 @@ struct Braco : public MovingEntity{
 struct Character : public MovingEntity{
     static constexpr float original_height = 30;
     float height;
+
     CharacterConfigurations config;
     Boundaries boundaries;
+    
     Braco* braco;
+    RotatingRect* perna_1;
+    RotatingRect* perna_2;
+    
     Shot* shot = nullptr;
     int shot_cooldown = 1000;
     int shot_cooldown_original_value = 1000;
@@ -154,16 +184,18 @@ struct Character : public MovingEntity{
         Rect* perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
         // Monta a perna direita
-        Entity* coxa_dir = new RotatingRect();
+        RotatingRect* coxa_dir = perna_1 = new RotatingRect();
         coxa_dir->setNome("coxa direita");
         coxa_dir->setShape(perna_shape);
         coxa_dir->setColor(config.perna_color);
         coxa_dir->transform.position.y = - height*config.tronco_height/2;
-        coxa_dir->transform.eulerRotation.z = 180.0f;
+        coxa_dir->original_rotation = 180.0f;
+        coxa_dir->angular_moveConfigurations.max = 225.0f;
+        coxa_dir->angular_moveConfigurations.min = 135.0f;
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
-        Entity* canela_dir = new RotatingRect();
+        RotatingRect* canela_dir = new RotatingRect();
         canela_dir->setNome("canela direita");
         canela_dir->setShape(perna_shape);
         canela_dir->setColor(config.perna_color);
@@ -177,12 +209,15 @@ struct Character : public MovingEntity{
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
         
-        Entity* coxa_esq = new RotatingRect();
+        RotatingRect* coxa_esq = perna_2 = new RotatingRect();
         coxa_esq->setNome("coxa esquerda");
         coxa_esq->setShape(perna_shape);
         coxa_esq->setColor(config.perna_color);
         coxa_esq->transform.position.y = - height*config.tronco_height/2;
-        coxa_esq->transform.eulerRotation.z = 180.0f;
+        coxa_esq->original_rotation = 180.0f;
+        coxa_esq->angular_moveConfigurations.max = 225.0f;
+        coxa_esq->angular_moveConfigurations.min = 135.0f;
+        coxa_esq->angular_moveConfigurations.velocity = -coxa_esq->angular_moveConfigurations.velocity;
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
@@ -195,6 +230,9 @@ struct Character : public MovingEntity{
         coxa_esq->addChild(canela_esq);
 
         this->addChild(coxa_esq);
+    
+        this->perna_1->reset();
+        this->perna_2->reset();
         
     }
 
@@ -331,6 +369,17 @@ struct Character : public MovingEntity{
 
     virtual void move(GLdouble deltaTime){
         MovingEntity::move(deltaTime);
+
+        
+        if(this->x_moveConfigurations.velocity == 0.0f){
+            this->perna_1->can_move = false;
+            this->perna_2->can_move = false;
+            this->perna_1->reset();
+            this->perna_2->reset();
+        }else{
+            this->perna_1->can_move = true;
+            this->perna_2->can_move = true;
+        }
 
         if(
             this->transform.position.y + this->y_moveConfigurations.velocity*deltaTime >= this->y_moveConfigurations.max // Se chegou na altura máxima ou
@@ -561,7 +610,11 @@ struct Enemy : public Character{
 
         Character::act(keyStatus, deltaTime);
 
-        if(keyStatus[(int) ('c')]) this->can_move = !this->can_move;
+        if(keyStatus[(int) ('c')]) {
+            this->can_move = !this->can_move;
+            this->perna_1->can_move = this->can_move;
+            this->perna_2->can_move = this->can_move;
+        }
 
         if(keyStatus[(int) ('z')]) this->can_shot = !this->can_shot;
 
