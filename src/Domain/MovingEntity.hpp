@@ -20,7 +20,7 @@ struct MoveConfigurations{
 
 struct MovingEntity : public Entity{
 
-
+    bool is_paused = false;
     float velocity = 0.0f;
     MoveConfigurations x_moveConfigurations;
     MoveConfigurations y_moveConfigurations;
@@ -34,10 +34,19 @@ struct MovingEntity : public Entity{
         this->angular_moveConfigurations = ang_config;
     }
 
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+
+        Entity::act(keyStatus, deltaTime);
+
+        if(keyStatus[(int) 'p']) this->is_paused = !this->is_paused;
+    }
+
     /*
      * @brief Função genérica de movimento de translação
      */
     virtual void move(GLdouble deltaTime){
+
+        if(is_paused) return;
 
         // Calcula novas posições
         float   new_x_position = this->transform.position.x + x_moveConfigurations.velocity * deltaTime,
@@ -73,6 +82,8 @@ struct MovingEntity : public Entity{
      * @brief Função genérica de movimento de rotação
      */
     virtual void rotate(GLdouble deltaTime){
+
+        if(is_paused) return;
 
         // Calcula nova rotação
         float new_angular_rotation = this->transform.eulerRotation.z + angular_moveConfigurations.velocity * deltaTime;

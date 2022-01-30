@@ -325,7 +325,7 @@ struct Character : public MovingEntity{
     virtual void act(int* keyStatus, GLdouble deltaTime){
         MovingEntity::act(keyStatus,  deltaTime);
 
-        if(keyStatus[(int) 'p']) return;
+        if(is_paused) return;
 
         this->shot_cooldown -= deltaTime;
     }
@@ -341,7 +341,7 @@ struct Character : public MovingEntity{
     }
 
     virtual void do_shot(GLdouble deltaTime){
-        if (this->shot_cooldown > 0) return;
+        if (this->shot_cooldown > 0 || is_paused) return;
 
         this->shot_cooldown = 1000;
         if(this->is_player) this->shot = new PlayerShot(this->braco->height);
@@ -437,9 +437,20 @@ struct Player : public Character{
 };
 
 struct Enemy : public Character{
+    bool can_move = false;
+
     Enemy(float height = Character::original_height) : Character(height){};
 
-    virtual void act(int* keyStatus, GLdouble deltaTime){ };
+    virtual void act(int* keyStatus, GLdouble deltaTime){ 
+
+        MovingEntity::act(keyStatus, deltaTime);
+
+        if(keyStatus[(int) ('c')]) this->can_move = !this->can_move;
+
+        if(is_paused || !this->can_move) return;
+
+
+    };
 
 };
 

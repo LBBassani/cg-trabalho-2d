@@ -29,14 +29,22 @@ struct Shot : public MovingEntity{
         this->parent->children.remove(this);
     }
 
-    virtual void act(int*, GLdouble deltaTime){
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        MovingEntity::act(keyStatus, deltaTime);
+
+        this->move(deltaTime);
+    }
+
+    virtual void move(GLdouble deltaTime){
+
+        if(is_paused) return;
         glm::vec3 original_position = this->transform.position;
-        //this->move(deltaTime);
         this->hitbox_offset.x = this->shape_offset.x += x_moveConfigurations.velocity*deltaTime;
         this->transform.position = original_position;
         #if defined TEST
             //std::cout << "Posição do tiro: (" << this->shape_offset.x << ", " << this->shape_offset.y << ")" << std::endl;
         #endif
+
     }
 
     virtual void do_collision(std::list<HitboxMapping> colliding_hitbox){

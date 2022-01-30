@@ -32,6 +32,14 @@ struct Text : public Entity{
         #endif
     }
 
+    virtual void addChild(Entity* entity){
+        Entity::addChild(entity);
+        if(Text* child = dynamic_cast<Text*>(entity)){
+            child->shape_offset.x += this->shape_offset.x;
+            child->shape_offset.y += this->shape_offset.y;
+        }
+    }
+
     virtual void setText(std::string text){
         text_shape->text = text;
     }
@@ -40,7 +48,7 @@ struct Text : public Entity{
         this->can_show = can_show;
         for (auto child : children){
             if(Text* child_text = dynamic_cast<Text*>(child)){
-                child_text->can_show = can_show;
+                child_text->set_can_show(can_show);
             }
         }
     }
@@ -57,7 +65,15 @@ struct Text : public Entity{
 
             glScalef(this->scale.x, this->scale.y, this->scale.z);
             glTranslatef(-text_width/2 + this->shape_offset.x, this->shape_offset.y, 0.0f);
+
+            #if defined TEST
+                std::cout << "Imprimindo " << this->getNome() << std::endl;
+            #endif
         }
+
+        #if defined TEST
+            else std::cout << "Não pode mostrar " << this->getNome() << std::endl;
+        #endif
         return this->can_show;
     }
 

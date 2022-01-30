@@ -36,7 +36,7 @@ struct Entity : public Model
         }
     }
 
-    void addChild(Entity* entity){
+    virtual void addChild(Entity* entity){
         children.emplace_back(entity);
         children.back()->parent = this;
     }
@@ -61,7 +61,7 @@ struct Entity : public Model
         }
     }
 
-    void print(){
+    virtual void print(){
         std::cout << this->nome << std::endl;
         for(auto child : children){
             child->print();

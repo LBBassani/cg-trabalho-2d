@@ -3,6 +3,7 @@
 
 #include "MovingEntity.hpp"
 #include "Character.hpp"
+#include "Text.hpp"
 
 #include "../Third-Party-Libs/glm/glm.hpp"
 
@@ -12,6 +13,7 @@ struct Camera : public MovingEntity{
     Player* player_to_follow = nullptr;
     bool is_there_a_player_to_follow = false;
     int auto_key_last_value = 0;
+    Text* menu;
 
     Camera(float velocity = 0.5f){
         this->velocity = velocity;
@@ -21,6 +23,29 @@ struct Camera : public MovingEntity{
 
         this->y_moveConfigurations.max = 5000;
         this->y_moveConfigurations.min = -5000;
+
+        this->menu = new Text("Paused");
+        Subtext* sub_1 = new Subtext(" ");
+        this->menu->addChild(sub_1);
+        Subtext* sub_2 = new Subtext("r -> restart");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        sub_2 = new Subtext("m -> show mouse");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        sub_2 = new Subtext("c -> enemies will move");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        sub_2 = new Subtext("f -> enable free camera control");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        this->menu->set_can_show(true);
+
+    }
+
+    virtual void print(){
+        Entity::print();
+        this->menu->print();
     }
 
     void setPlayer(Player* player){
@@ -49,11 +74,27 @@ struct Camera : public MovingEntity{
         }
     }
 
+    virtual void show_menu(){
+        this->menu->draw();
+    }
+
+    virtual void draw(){
+        Entity::draw();
+        
+        if(is_paused){
+            this->show_menu();
+        }
+    }
+
     virtual void act(int* keyStatus, GLdouble deltaTime){
 
-        if (keyStatus[(int) ('c')] != auto_key_last_value){
-            auto_key_last_value = keyStatus[(int) ('c')]; //debouncing
-            if(keyStatus[(int) ('c')])
+        MovingEntity::act(keyStatus, deltaTime);
+
+        if(is_paused) return;
+
+        if (keyStatus[(int) ('f')] != auto_key_last_value){
+            auto_key_last_value = keyStatus[(int) ('f')]; //debouncing
+            if(keyStatus[(int) ('f')])
                 setAuto(!is_auto);
         }
 
