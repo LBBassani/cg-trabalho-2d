@@ -66,13 +66,6 @@ struct OpenGLStarter{
         this->openGLConfig = OpenGLConfig(config);
         this->sceneName = fileName;
         this->makeWorld();
-        Cascading_Timed_Text* t_1 = new Cascading_Timed_Text();
-        Timed_Text* t_2 = new Timed_Text("Good morning");
-        Subtext* t_3 = new Subtext("world");
-        t_2->addChild(t_3);
-        t_1->addChild(t_2);
-        this->sceneTree.root->addChild(t_1);
-        t_1->set_can_show(true);
     }
 
     virtual void makeWorld(){
@@ -164,6 +157,7 @@ struct OpenGLStarter{
     
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+        glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
         // Create the window.
         glutInitWindowSize(openGLConfig.width, openGLConfig.height);

@@ -160,6 +160,61 @@ struct ParserSVG{
         #if defined TEST
             std::cout << zoom_factor << std::endl;
         #endif
+
+        // Textos no inicio
+        Cascading_Timed_Text* t_1 = new Cascading_Timed_Text("Hello", 2000);
+        scene_root->addChild(t_1);
+        Cascading_Timed_Text* t_2 = new Cascading_Timed_Text(" ", 500);
+        t_1->addChild(t_2);
+
+        Cascading_Timed_Text* t_3 = new Cascading_Timed_Text("", 2000); // Timer para ativar o próximo
+        t_2->addChild(t_3);
+
+        Timed_Text* t_4 = new Timed_Text("", 2000); // Timer para ficar ativo
+        Subtext* sub = new Subtext("You can move on 'a' 'd'");
+        t_4->addChild(sub);
+        t_2->addChild(t_4);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text(" ", 500); // Intervalo
+        t_2->addChild(t_3);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text("", 2000);  // Timer para ativar o próximo
+        t_2->addChild(t_3);
+
+        t_4 = new Timed_Text("", 2000); // Timer para ficar ativo
+        sub = new Subtext("You can jump on mouse right click"); 
+        t_4->addChild(sub);
+        t_2->addChild(t_4);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text(" ", 500); // Intervalo
+        t_2->addChild(t_3);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text("", 2000);  // Timer para ativar o próximo
+        t_2->addChild(t_3);
+
+        t_4 = new Timed_Text("", 2000); // Timer para ficar ativo
+        sub = new Subtext("You can shoot on mouse left click");
+        t_4->addChild(sub);
+        t_2->addChild(t_4);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text(" ", 500); // Intervalo
+        t_2->addChild(t_3);
+
+        t_2 = t_3;
+        t_3 = new Cascading_Timed_Text("", 2000);  // Timer para ativar o próximo
+        t_2->addChild(t_3);
+
+        t_4 = new Timed_Text("", 2000); // Timer para ficar ativo
+        sub = new Subtext("You can pause on 'p'");
+        t_4->addChild(sub);
+        t_2->addChild(t_4);
+
+        t_1->set_can_show(true);
             
         return scene_root;
     }

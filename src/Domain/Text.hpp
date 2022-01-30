@@ -134,6 +134,8 @@ struct Timed_Text : public Text{
 
 struct Cascading_Timed_Text : public Timed_Text{
 
+    Cascading_Timed_Text(std::string text = "Ohayo Sekai", int timer_value = 1000.0f) : Timed_Text(text, timer_value){ };
+
     virtual void set_can_show(bool can_show){
         this->can_show = can_show;
     };
