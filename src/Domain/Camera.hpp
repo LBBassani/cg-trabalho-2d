@@ -36,6 +36,9 @@ struct Camera : public MovingEntity{
         sub_2 = new Subtext("c -> enemies will move");
         sub_1->addChild(sub_2);
         sub_1 = sub_2;
+        sub_2 = new Subtext("z -> enemies will shoot");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
         sub_2 = new Subtext("f -> enable free camera control");
         sub_1->addChild(sub_2);
         sub_1 = sub_2;

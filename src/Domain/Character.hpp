@@ -437,6 +437,7 @@ struct Player : public Character{
 
 struct Enemy : public Character{
     bool can_move = false;
+    bool can_shot = false;
     int move_cooldown;
     int original_move_cooldown_value;
     int n = 1;
@@ -562,6 +563,8 @@ struct Enemy : public Character{
 
         if(keyStatus[(int) ('c')]) this->can_move = !this->can_move;
 
+        if(keyStatus[(int) ('z')]) this->can_shot = !this->can_shot;
+
         if(is_paused || !this->can_move) return;
 
         #if defined TEST
@@ -593,7 +596,7 @@ struct Enemy : public Character{
         #endif
 
 
-        if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0) this->do_shot(deltaTime);
+        if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0 && can_shot) this->do_shot(deltaTime);
 
     };
 
