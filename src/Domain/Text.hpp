@@ -1,10 +1,5 @@
 #if !defined TEXT
 #define TEXT
-#define GLT_IMPLEMENTATION
-#define STB_TRUETYPE_IMPLEMENTATION
-#define VERTEXT_IMPLEMENTATION
-
-//#include "../Third-Party-Libs/glText/gltext.h"
 
 #include "Entity.hpp"
 #include "Shape.hpp"
@@ -67,12 +62,12 @@ struct Text : public Entity{
             glTranslatef(-text_width/2 + this->shape_offset.x, this->shape_offset.y, 0.0f);
 
             #if defined TEST
-                std::cout << "Imprimindo " << this->getNome() << std::endl;
+                // std::cout << "Imprimindo " << this->getNome() << std::endl;
             #endif
         }
 
         #if defined TEST
-            else std::cout << "Não pode mostrar " << this->getNome() << std::endl;
+            // else std::cout << "Não pode mostrar " << this->getNome() << std::endl;
         #endif
         return this->can_show;
     }
