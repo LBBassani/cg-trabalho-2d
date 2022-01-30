@@ -50,6 +50,20 @@ struct RotatingRect : public MovingEntity{
 
     virtual void reset(){
         this->transform.eulerRotation.z = this->original_rotation;
+        for(auto entity : children){
+            if(RotatingRect* child = dynamic_cast<RotatingRect*>(entity)){
+                child->reset();
+            }
+        }
+    }
+
+    virtual void set_can_move(bool can_move){
+        this->can_move = can_move;
+        for(auto entity : children){
+            if(RotatingRect* child = dynamic_cast<RotatingRect*>(entity)){
+                child->set_can_move(can_move);
+            }
+        }
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
@@ -190,8 +204,8 @@ struct Character : public MovingEntity{
         coxa_dir->setColor(config.perna_color);
         coxa_dir->transform.position.y = - height*config.tronco_height/2;
         coxa_dir->original_rotation = 180.0f;
-        coxa_dir->angular_moveConfigurations.max = 225.0f;
-        coxa_dir->angular_moveConfigurations.min = 135.0f;
+        coxa_dir->angular_moveConfigurations.max = 240.0f;
+        coxa_dir->angular_moveConfigurations.min = 120.0f;
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
@@ -200,6 +214,9 @@ struct Character : public MovingEntity{
         canela_dir->setShape(perna_shape);
         canela_dir->setColor(config.perna_color);
         canela_dir->transform.position.y = height*config.meia_perna;
+        canela_dir->angular_moveConfigurations.max = 0.0f;
+        canela_dir->angular_moveConfigurations.min = -60.0f;
+        canela_dir->angular_moveConfigurations.velocity = -canela_dir->angular_moveConfigurations.velocity/2;
         
         coxa_dir->addChild(canela_dir);
 
@@ -215,17 +232,20 @@ struct Character : public MovingEntity{
         coxa_esq->setColor(config.perna_color);
         coxa_esq->transform.position.y = - height*config.tronco_height/2;
         coxa_esq->original_rotation = 180.0f;
-        coxa_esq->angular_moveConfigurations.max = 225.0f;
-        coxa_esq->angular_moveConfigurations.min = 135.0f;
+        coxa_esq->angular_moveConfigurations.max = 240.0f;
+        coxa_esq->angular_moveConfigurations.min = 120.0f;
         coxa_esq->angular_moveConfigurations.velocity = -coxa_esq->angular_moveConfigurations.velocity;
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
-        Entity* canela_esq = new RotatingRect();
+        RotatingRect* canela_esq = new RotatingRect();
         canela_esq->setNome("canela esquerda");
         canela_esq->setShape(perna_shape);
         canela_esq->setColor(config.perna_color);
         canela_esq->transform.position.y = height*config.meia_perna;
+        canela_esq->angular_moveConfigurations.max = 0.0f;
+        canela_esq->angular_moveConfigurations.min = -60.0f;
+        canela_dir->angular_moveConfigurations.velocity = canela_dir->angular_moveConfigurations.velocity/2;
 
         coxa_esq->addChild(canela_esq);
 
@@ -372,13 +392,13 @@ struct Character : public MovingEntity{
 
         
         if(this->x_moveConfigurations.velocity == 0.0f){
-            this->perna_1->can_move = false;
-            this->perna_2->can_move = false;
+            this->perna_1->set_can_move( false );
+            this->perna_2->set_can_move( false );
             this->perna_1->reset();
             this->perna_2->reset();
         }else{
-            this->perna_1->can_move = true;
-            this->perna_2->can_move = true;
+            this->perna_1->set_can_move( true );
+            this->perna_2->set_can_move( true );
         }
 
         if(
