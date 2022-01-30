@@ -11,6 +11,7 @@
 #include "ScenarioConfig.hpp"
 #include "../Domain/SceneTree.hpp"
 #include "../Domain/Shape.hpp"
+#include "../Domain/Text.hpp"
 
 #define NUM_TECLAS_ASCII 256
 #define LEFT_CLICK 256
@@ -65,6 +66,8 @@ struct OpenGLStarter{
         this->openGLConfig = OpenGLConfig(config);
         this->sceneName = fileName;
         this->makeWorld();
+        Text* text = new Text("Ohayo Sekai!");
+        this->sceneTree.root->addChild(text);
     }
 
     virtual void makeWorld(){

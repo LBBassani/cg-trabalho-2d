@@ -13,9 +13,9 @@ struct Model{
     std::string nome;
     Shape *shape = nullptr;
     Shape *hitbox = nullptr;
-    glm::vec2 hitbox_offset;
-    glm::vec2 shape_offset;
-    glm::vec3 color;
+    glm::vec2 hitbox_offset = {0.0f, 0.0f};
+    glm::vec2 shape_offset = {0.0f, 0.0f};
+    glm::vec3 color = {1.0f, 1.0f, 1.0f};
 
     virtual std::string getNome() { return nome; };
     virtual void setNome(std::string nome) { this->nome = nome; };
