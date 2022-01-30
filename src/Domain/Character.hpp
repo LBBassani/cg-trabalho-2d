@@ -10,13 +10,7 @@
 #include "MovingEntity.hpp"
 #include "Shape.hpp"
 #include "Shot.hpp"
-
-#define MOUSE_LEFT_CLICK 256
-#define MOUSE_RIGHT_CLICK 257
-#define MOUSE_X_COORD 258
-#define MOUSE_Y_COORD 259
-#define PLAYER_X_COORD 260
-#define PLAYER_Y_COORD 261
+#include "Utils.hpp"
 
 struct CharacterConfigurations{
     float cabeca = 0.3;
@@ -256,8 +250,8 @@ struct Character : public MovingEntity{
         }
         
         #if defined TEST
-            /* std::cout << colliding_hitboxes.begin()->entity_ptr->getNome() << " p1: (" << colliding_hitboxes.begin()->canto_inf_esquerdo.x << ", " << colliding_hitboxes.begin()->canto_inf_esquerdo.y << ") p2: (" << colliding_hitboxes.begin()->canto_sup_direito.x << ", " << colliding_hitboxes.begin()->canto_sup_direito.y << ") "<< std::endl;
-            exit (0); */
+            //std::cout << colliding_hitboxes.begin()->entity_ptr->getNome() << " p1: (" << colliding_hitboxes.begin()->canto_inf_esquerdo.x << ", " << colliding_hitboxes.begin()->canto_inf_esquerdo.y << ") p2: (" << colliding_hitboxes.begin()->canto_sup_direito.x << ", " << colliding_hitboxes.begin()->canto_sup_direito.y << ") "<< std::endl;
+            //exit (0);
         #endif
 
         for(auto colliding_hitbox : colliding_hitboxes){
@@ -272,18 +266,18 @@ struct Character : public MovingEntity{
             };
 
             #if defined TEST
-                /* std::cout << boundaries_hitboxes[0]->is_colliding(colliding_hitbox) << std::endl;
-                std::cout << boundaries_hitboxes[1]->is_colliding(colliding_hitbox) << std::endl;
-                std::cout << boundaries_hitboxes[2]->is_colliding(colliding_hitbox) << std::endl;
-                std::cout << boundaries_hitboxes[3]->is_colliding(colliding_hitbox) << std::endl; */
+                //std::cout << boundaries_hitboxes[0]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[1]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[2]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[3]->is_colliding(colliding_hitbox) << std::endl;
             #endif
 
             const int N = sizeof(collisions_area) / sizeof(float);
             #if defined TEST
-                /* for(auto valor : collisions_area){
-                    std::cout << valor << " ";
-                }
-                std::cout << std::endl; */
+                //for(auto valor : collisions_area){
+                //    std::cout << valor << " ";
+                //}
+                //std::cout << std::endl;
             #endif
 
             if(collisions_area[0] || collisions_area[1] || collisions_area[2] || collisions_area[3]) collision[(std::distance(collisions_area, std::max_element(collisions_area, collisions_area + N)))] = true;
@@ -320,6 +314,10 @@ struct Character : public MovingEntity{
                 //std::cout << "Não pode mover pra baixo" << std::endl;
             #endif
         } else this->moveLiberty.para_baixo = true;
+
+        for (auto boundary : boundaries_hitboxes){
+            delete boundary;
+        }
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
@@ -378,15 +376,15 @@ struct Player : public Character{
         // Anima as perninhas
 
         // Se mudar de direção, muda o braço de direção
-        /* if(this->x_moveConfigurations.velocity > 0.0f){
-            this->braco->transform.position.x = this->braco->width/2;
-            this->braco->transform.eulerRotation.z = 180.f;
-            this->braco->transform.position.y = this->braco->height;
-        } else if (this->x_moveConfigurations.velocity < 0.0f){
-            this->braco->transform.position.x = -this->braco->width/2;
-            this->braco->transform.eulerRotation.z = 0.0f;
-            this->braco->transform.position.y = 0.0f;
-        } */
+        //if(this->x_moveConfigurations.velocity > 0.0f){
+        //    this->braco->transform.position.x = this->braco->width/2;
+        //    this->braco->transform.eulerRotation.z = 180.f;
+        //    this->braco->transform.position.y = this->braco->height;
+        //} else if (this->x_moveConfigurations.velocity < 0.0f){
+        //    this->braco->transform.position.x = -this->braco->width/2;
+        //    this->braco->transform.eulerRotation.z = 0.0f;
+        //    this->braco->transform.position.y = 0.0f;
+        //}
         
     }
 
@@ -438,17 +436,158 @@ struct Player : public Character{
 
 struct Enemy : public Character{
     bool can_move = false;
+    int move_cooldown;
+    int original_move_cooldown_value;
 
-    Enemy(float height = Character::original_height) : Character(height){};
+    Enemy(float height = Character::original_height, int original_move_cooldown = 3000) : Character(height){
+        this->velocity = 0.015f;
+        this->x_moveConfigurations.velocity = this->velocity;
+        this->y_moveConfigurations.velocity = -0.01f;
+        
+        this->x_moveConfigurations.max = 5000;
+        this->x_moveConfigurations.min = -5000;
+
+        this->move_cooldown = this->original_move_cooldown_value = original_move_cooldown;
+        #if defined TEST
+            //std::cout << move_cooldown << std::endl;
+        #endif
+    };
+
+    virtual void do_collision(std::list<HitboxMapping> colliding_hitboxes){
+        #if defined TEST
+            //std::cout << "Entrou em do collision" << std::endl;
+        #endif
+        bool collision[] = {false, false, false, false};
+        Rect* hitbox = nullptr;
+
+        HitboxMapping* boundaries_hitboxes[] = {
+            new HitboxMapping(boundaries.limite_direito),
+            new HitboxMapping(boundaries.limite_esquerdo),
+            new HitboxMapping(boundaries.limite_superior),
+            new HitboxMapping(boundaries.limite_inferior)
+        };
+
+        for (auto boundary : boundaries_hitboxes){
+            boundary->update_hitbox();
+        }
+        
+        #if defined TEST
+            //std::cout << colliding_hitboxes.begin()->entity_ptr->getNome() << " p1: (" << colliding_hitboxes.begin()->canto_inf_esquerdo.x << ", " << colliding_hitboxes.begin()->canto_inf_esquerdo.y << ") p2: (" << colliding_hitboxes.begin()->canto_sup_direito.x << ", " << colliding_hitboxes.begin()->canto_sup_direito.y << ") "<< std::endl;
+            //exit (0);
+        #endif
+
+        for(auto colliding_hitbox : colliding_hitboxes){
+
+            if(colliding_hitbox.entity_ptr->is_trigger) continue;
+
+            float collisions_area[] = {
+                boundaries_hitboxes[0]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[0]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[1]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[1]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[2]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[2]->percentage_of_overlapping(colliding_hitbox) : 0,
+                boundaries_hitboxes[3]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[3]->percentage_of_overlapping(colliding_hitbox) : 0
+            };
+
+            #if defined TEST
+                //std::cout << boundaries_hitboxes[0]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[1]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[2]->is_colliding(colliding_hitbox) << std::endl;
+                //std::cout << boundaries_hitboxes[3]->is_colliding(colliding_hitbox) << std::endl; */
+            #endif
+
+            const int N = sizeof(collisions_area) / sizeof(float);
+            #if defined TEST
+                //for(auto valor : collisions_area){
+                //    std::cout << valor << " ";
+                //}
+                //std::cout << std::endl;
+            #endif
+
+            if(collisions_area[0] || collisions_area[1] || collisions_area[2] || collisions_area[3]) collision[(std::distance(collisions_area, std::max_element(collisions_area, collisions_area + N)))] = true;
+
+            if(collision[3] && !hitbox){
+                hitbox = dynamic_cast<Rect*>(colliding_hitbox.entity_ptr->hitbox);
+                this->x_moveConfigurations.max = colliding_hitbox.entity_ptr->transform.position.x + hitbox->width/2;
+                this->x_moveConfigurations.min = colliding_hitbox.entity_ptr->transform.position.x - hitbox->width/2;
+            }
+           
+        }
+        
+        if (collision[0]) {
+            this->moveLiberty.direita = false;
+            #if defined TEST
+                //std::cout << "Não pode mover pra direita" << std::endl;
+            #endif
+        } else this->moveLiberty.direita = true;
+
+        if (collision[1]) {
+            this->moveLiberty.esquerda = false;
+            #if defined TEST
+                //std::cout << "Não pode mover pra esquerda" << std::endl;
+            #endif
+        } else this->moveLiberty.esquerda = true;
+        
+        if (collision[2]) {
+            this->moveLiberty.para_cima = false;
+            this->can_jump = false;
+            #if defined TEST
+                //std::cout << "Não pode mover pra cima" << std::endl;
+            #endif
+        } else this->moveLiberty.para_cima = true;
+
+        if (collision[3]) {
+            this->moveLiberty.para_baixo = false;
+            #if defined TEST
+                //std::cout << "Não pode mover pra baixo" << std::endl;
+            #endif
+        } else this->moveLiberty.para_baixo = true;
+
+        for (auto boundary : boundaries_hitboxes){
+            delete boundary;
+        }
+
+    }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){ 
 
-        MovingEntity::act(keyStatus, deltaTime);
+        Character::act(keyStatus, deltaTime);
 
         if(keyStatus[(int) ('c')]) this->can_move = !this->can_move;
 
         if(is_paused || !this->can_move) return;
 
+        #if defined TEST
+            //std::cout << this->getNome() << " pode se mover entre: " << this->x_moveConfigurations.max << " e " << this->x_moveConfigurations.min << std::endl;
+        #endif
+
+        move_cooldown -= deltaTime;
+        #if defined TEST
+            //if(this->getNome() == "Enemy 1") std::cout << move_cooldown << std::endl;
+        #endif
+        
+        int n = std::stoi(first_numberstring(this->getNome()));
+        while(n > 10) n /= 10;
+
+        bool chegou_limite = (this->transform.position.x + this->x_moveConfigurations.velocity*deltaTime >= this->x_moveConfigurations.max) 
+                            || (this->transform.position.x + this->x_moveConfigurations.velocity*deltaTime <= this->x_moveConfigurations.min);
+
+        if(!( (int) deltaTime*100 % n ) && move_cooldown <= 0 || !moveLiberty.esquerda || !moveLiberty.direita || chegou_limite)  {
+            if(move_cooldown <= 0) move_cooldown = original_move_cooldown_value;
+            else move_cooldown += 1000;
+            move_cooldown = std::min(original_move_cooldown_value, move_cooldown);
+            #if defined TEST
+                //std::cout << this->getNome() << " n: " << n << std::endl;
+            #endif
+            this->x_moveConfigurations.velocity = -this->x_moveConfigurations.velocity;
+        }
+
+        this->move(deltaTime);
+
+        #if defined TEST
+            //std::cout << this->getNome() << " vai se mover para: " << this->transform.position.x << std::endl;
+        #endif
+
+
+        //if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0) this->do_shot(deltaTime);
 
     };
 

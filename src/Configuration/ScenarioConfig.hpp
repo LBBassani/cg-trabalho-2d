@@ -131,6 +131,7 @@ struct ParserSVG{
                     character->setNome("Player");
                     scene_root->setPlayer(player);
                     background->transform.position.x = -(x - x_0 + r/2);
+                    
                 } else{
                     character = new Enemy(r*2);
                     enemy_count++;
@@ -142,9 +143,9 @@ struct ParserSVG{
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
 
-                character->y_moveConfigurations.min = character->transform.position.y - r;
+                character->y_moveConfigurations.min = character->transform.position.y - r*2;
                 character->y_moveConfigurations.max = character->transform.position.y + r*6; // Pula 3x a própria altura
-
+ 
                 background->addChild(character);
                 character->create_boundaries();
             }
