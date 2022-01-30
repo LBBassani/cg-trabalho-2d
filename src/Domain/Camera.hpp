@@ -18,11 +18,11 @@ struct Camera : public MovingEntity{
     Camera(float velocity = 0.5f){
         this->velocity = velocity;
 
-        this->x_moveConfigurations.max = 5000;
-        this->x_moveConfigurations.min = -5000;
+        this->x_moveConfigurations.max = std::numeric_limits<float>::max();
+        this->x_moveConfigurations.min = -std::numeric_limits<float>::max();
 
-        this->y_moveConfigurations.max = 5000;
-        this->y_moveConfigurations.min = -5000;
+        this->y_moveConfigurations.max = std::numeric_limits<float>::max();
+        this->y_moveConfigurations.min = -std::numeric_limits<float>::max();
 
         this->menu = new Text("Paused");
         Subtext* sub_1 = new Subtext(" ");
