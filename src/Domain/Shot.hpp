@@ -24,7 +24,7 @@ struct Shot : public MovingEntity{
 
     ~Shot(){
         #if defined TEST
-            std::cout << "Tiro morreu" << std::endl;
+            // std::cout << "Tiro morreu" << std::endl;
         #endif
         this->parent->children.remove(this);
     }

@@ -66,8 +66,6 @@ struct OpenGLStarter{
         this->openGLConfig = OpenGLConfig(config);
         this->sceneName = fileName;
         this->makeWorld();
-        Text* text = new Text("Ohayo Sekai!");
-        this->sceneTree.root->addChild(text);
     }
 
     virtual void makeWorld(){

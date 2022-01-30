@@ -21,6 +21,7 @@ struct Entity : public Model
     bool is_movable = false;
     bool is_character = false;
     bool is_player = false; 
+    bool is_trigger = false;
     MoveLiberty moveLiberty;
 
     Transform transform;
@@ -67,10 +68,15 @@ struct Entity : public Model
         }
     }
 
-    virtual void draw(){
+    virtual bool prepare_drawing(){
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glLoadMatrixf(&transform.modelMatrix[0][0]);
+        return true;
+    }
+
+    virtual void draw(){
+        if(!prepare_drawing()) return;        
 
         Model::draw();
 

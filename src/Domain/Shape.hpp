@@ -79,6 +79,7 @@ struct Triangle : public Shape{
 struct TextShape : public Shape{
     void *font;
     std::string text;
+    float line_width = 1.0f;
 
     TextShape(std::string text = "Ohayo sekai", void *font = GLUT_STROKE_MONO_ROMAN){
         this->font = font;
@@ -86,6 +87,7 @@ struct TextShape : public Shape{
     }
 
     virtual void draw(){
+        glLineWidth(line_width);
         const unsigned char* t = reinterpret_cast<const unsigned char *>(text.c_str());
         for(int i = 0; i < text.length(); i++)
             glutStrokeCharacter(this->font, t[i]);

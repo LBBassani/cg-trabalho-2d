@@ -262,6 +262,8 @@ struct Character : public MovingEntity{
 
         for(auto colliding_hitbox : colliding_hitboxes){
 
+            if(colliding_hitbox.entity_ptr->is_trigger) continue;
+
             float collisions_area[] = {
                 boundaries_hitboxes[0]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[0]->percentage_of_overlapping(colliding_hitbox) : 0,
                 boundaries_hitboxes[1]->is_colliding(colliding_hitbox) ? boundaries_hitboxes[1]->percentage_of_overlapping(colliding_hitbox) : 0,

@@ -9,6 +9,7 @@
 #include "../Domain/SceneTree.hpp"
 #include "../Domain/Character.hpp"
 #include "../Domain/Camera.hpp"
+#include "../Domain/Text.hpp"
 #include "../Third-Party-Libs/rapidxml-1.13/rapidxml.hpp"
 
 struct ParserSVG{
@@ -20,6 +21,9 @@ struct ParserSVG{
 
         Entity* background = new Entity();
         background->setNome("Background");
+
+        Entity* game_won_message = game_won_message = new Colliding_Text("You won!!");
+        game_won_message->addChild(new Subtext("Press r to restart"));
 
         rapidxml::xml_document<> doc;
         rapidxml::xml_node<> * root_node = NULL;
@@ -105,6 +109,11 @@ struct ParserSVG{
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
                     parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, -1.0f));
                     background->addChild(parede);
+
+                    game_won_message->transform.position.x = newBackgroundModel->transform.position.x;
+                    game_won_message->transform.position.y = newBackgroundModel->transform.position.y;
+                    game_won_message->setHitbox(new Rect(10.0f, 10.0f), glm::vec2(width/2 - 10.0f, 0.0f));
+
                 }
                 
                 background->addChild(newBackgroundModel);
@@ -141,6 +150,7 @@ struct ParserSVG{
             }
         }
 
+        background->addChild(game_won_message);
         scene_root->addChild(background);
 
         // Configura zoom da tela
