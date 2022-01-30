@@ -18,13 +18,14 @@ void glutBitmapString(void* font, int length, const unsigned char * text){
 struct Text : public Entity{
 
     bool can_show = false;
-    TextShape text_shape;
+    TextShape* text_shape;
     glm::vec3 scale = {0.0f, 0.0f, 0.0f};
 
     Text(std::string text = "Ohayo sekai"){
         this->nome = "Texto: " + text;
+        this->text_shape = new TextShape();
         this->setText(text);
-        this->setShape(&text_shape);
+        this->setShape(text_shape);
         this->scale = {0.15f, 0.15f, 1.0f};
         #if defined TEST
             //this->can_show = true;
@@ -32,7 +33,7 @@ struct Text : public Entity{
     }
 
     virtual void setText(std::string text){
-        text_shape.text = text;
+        text_shape->text = text;
     }
 
     virtual void set_can_show(bool can_show){
@@ -47,8 +48,8 @@ struct Text : public Entity{
     virtual bool prepare_drawing(){
         if (this->can_show){
             int text_width = 0;
-            for(auto c : text_shape.text){
-                text_width += glutStrokeWidth(text_shape.font, c);
+            for(auto c : text_shape->text){
+                text_width += glutStrokeWidth(text_shape->font, c);
             }
 
             glMatrixMode(GL_MODELVIEW);
@@ -89,6 +90,24 @@ struct Subtext : public Text{
         this->shape_offset = {0.0f, -100.0f};
     }
 
+};
+
+struct Timed_Text : public Text{
+    int timer;
+    int timer_initial_value;
+
+    Timed_Text(std::string text = "Ohayo Sekai", int timer_value = 1000.0f) : Text(text){
+        this->timer = timer_value;
+        this->timer_initial_value = timer_value;
+    }
+
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        if(this->can_show) timer -= deltaTime;
+        if(timer <= 0){
+            this->can_show = false;
+            this->timer = this->timer_initial_value; 
+        }
+    }
 };
 
 #endif
