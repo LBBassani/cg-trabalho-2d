@@ -679,12 +679,27 @@ struct Enemy : public Character{
             this->can_move = !this->can_move;
             this->perna_1->set_can_move(this->can_move);
             this->perna_2->set_can_move(this->can_move);
+
+            std::string message = can_move ? "Enemies can move" : "Enemies can not move";
+            
+            #if defined TEST
+                //std::cout << message << std::endl;
+            #endif
+
+            Left_Corner_Timed_Minitext::change_left_corner_text(message);
         }
 
         can_shot_cooldown -= deltaTime;
         if(keyStatus[(int) ('z')] && can_shot_cooldown <= 0) {
             can_shot_cooldown = 500;
             this->can_shot = !this->can_shot;
+            std::string message = can_shot ? "Enemies can shoot" : "Enemies can not shoot";
+            
+            #if defined TEST
+                //std::cout << message << std::endl;
+            #endif
+
+            Left_Corner_Timed_Minitext::change_left_corner_text(message);
         }
 
         if(is_paused || game_ended || !this->can_move) return;

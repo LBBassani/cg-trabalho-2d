@@ -43,7 +43,7 @@ struct Text : public Entity{
         this->can_show = can_show;
 
         #if defined TEST
-            if(can_show) std::cout << this->getNome() << " can show " << std::endl;
+            // if(can_show) std::cout << this->getNome() << " can show " << std::endl;
         #endif 
 
         for (auto child : children){
@@ -53,12 +53,18 @@ struct Text : public Entity{
         }
     }
 
+    virtual int calcule_text_width(){
+        int text_width = 0;
+        for(auto c : text_shape->text){
+            text_width += glutStrokeWidth(text_shape->font, c);
+        }
+        return text_width;
+    }
+
     virtual bool prepare_drawing(){
         if (this->can_show){
-            int text_width = 0;
-            for(auto c : text_shape->text){
-                text_width += glutStrokeWidth(text_shape->font, c);
-            }
+            
+            int text_width = this->calcule_text_width();
 
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
@@ -67,7 +73,7 @@ struct Text : public Entity{
             glTranslatef(-text_width/2 + this->shape_offset.x, this->shape_offset.y, 0.0f);
 
             #if defined TEST
-                // std::cout << "Imprimindo " << this->getNome() << std::endl;
+                //std::cout << "Imprimindo " << this->getNome() << std::endl;
             #endif
         }
 
@@ -174,5 +180,36 @@ struct Cascading_Timed_Text : public Timed_Text{
     }
 
 };
+
+struct Left_Corner_Timed_Minitext : public Timed_Text{
+
+    static Left_Corner_Timed_Minitext* instance;
+    static int instance_timer;
+
+    Left_Corner_Timed_Minitext(std::string text = "Ohayo Sekai", int timer_value = 1000.0f) : Timed_Text(text, timer_value){
+        this->scale = {0.08f, 0.08f, 1.0f};
+        this->shape_offset = {-1500.0f, -1500.0f};
+    }
+
+    virtual void setText(std::string text){
+        Timed_Text::setText(text);
+    }
+
+    virtual int calcule_text_width(){
+        return 0;
+    }
+
+    static void change_left_corner_text(std::string message){
+        if(Left_Corner_Timed_Minitext::instance){
+            delete Left_Corner_Timed_Minitext::instance;
+            Left_Corner_Timed_Minitext::instance = nullptr;
+        }
+        Left_Corner_Timed_Minitext::instance = new Left_Corner_Timed_Minitext(message, Left_Corner_Timed_Minitext::instance_timer);
+        Left_Corner_Timed_Minitext::instance->set_can_show(true);
+    }
+};
+
+Left_Corner_Timed_Minitext* Left_Corner_Timed_Minitext::instance = nullptr;
+int Left_Corner_Timed_Minitext::instance_timer = 2000.f;
 
 #endif

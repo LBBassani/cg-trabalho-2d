@@ -49,6 +49,13 @@ struct Mouse : public Entity{
         if(keyStatus[(int) ('m')] && must_draw_cooldown <= 0){ 
             must_draw_cooldown = 500;
             must_draw = !must_draw;
+            std::string message = must_draw ? "Mouse is showing" : "Mouse is not showing";
+            
+            #if defined TEST
+                //std::cout << message << std::endl;
+            #endif
+
+            Left_Corner_Timed_Minitext::change_left_corner_text(message);
         }
         
         if(keyStatus[LEFT_CLICK]) this->setColor(color_on_left_click);
@@ -107,6 +114,7 @@ struct OpenGLStarter{
         glClear(GL_COLOR_BUFFER_BIT);   // Limpa tela
 
         instance->sceneTree.draw();     // Desenha cena no buffer
+        if(Left_Corner_Timed_Minitext::instance) Left_Corner_Timed_Minitext::instance->draw(); 
 
         glutSwapBuffers();              // Desenha a cena do buffer na tela
         glutPostRedisplay();
@@ -122,6 +130,7 @@ struct OpenGLStarter{
         instance->framerate = 1.0 / deltaTime * 1000;
 
         instance->sceneTree.idle(instance->keyStatus, deltaTime);
+        if(Left_Corner_Timed_Minitext::instance) Left_Corner_Timed_Minitext::instance->act(instance->keyStatus, deltaTime); 
     }
 
     static void keyPress(unsigned char key, int, int){

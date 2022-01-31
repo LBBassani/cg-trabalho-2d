@@ -12,7 +12,7 @@ struct Camera : public MovingEntity{
     bool is_auto = true;
     Player* player_to_follow = nullptr;
     bool is_there_a_player_to_follow = false;
-    int auto_key_last_value = 0;
+    int auto_key_cooldown = 500;
     Text* menu;
 
     Camera(float velocity = 0.5f){
@@ -97,10 +97,20 @@ struct Camera : public MovingEntity{
 
         if(is_paused) return;
 
-        if (keyStatus[(int) ('f')] != auto_key_last_value){
-            auto_key_last_value = keyStatus[(int) ('f')]; //debouncing
-            if(keyStatus[(int) ('f')])
-                setAuto(!is_auto);
+        auto_key_cooldown -= deltaTime;
+
+        if (keyStatus[(int) ('f')] && auto_key_cooldown <= 0){
+            auto_key_cooldown = 500; //debouncing
+            if(keyStatus[(int) ('f')]) setAuto(!is_auto);
+
+            std::string message = is_auto ? "Camera on auto mode" : "Camera on free mode";
+            
+            #if defined TEST
+                //std::cout << message << std::endl;
+            #endif
+
+            Left_Corner_Timed_Minitext::change_left_corner_text(message);
+
         }
 
         if(is_auto){
