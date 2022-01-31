@@ -100,6 +100,18 @@ struct Colliding_Text : public Text{
 
 };
 
+struct Game_Ending_Colliding_Text : public Colliding_Text{
+
+    Game_Ending_Colliding_Text(std::string text = "Ohayo sekai") : Colliding_Text(text){ }
+
+    virtual void do_collision(std::list<HitboxMapping> colliding_hitbox){
+        Colliding_Text::do_collision(colliding_hitbox);
+        if(this->can_show){
+            this->parent->set_game_ended(true);
+        }
+    }
+};
+
 struct Subtext : public Text{
     Subtext(std::string text = "Good morning world") : Text(text){
         this->scale = {0.1f, 0.1f, 1.0f};

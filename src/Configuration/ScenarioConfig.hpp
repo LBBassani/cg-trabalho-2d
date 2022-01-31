@@ -22,7 +22,7 @@ struct ParserSVG{
         Entity* background = new Entity();
         background->setNome("Background");
 
-        Entity* game_won_message = game_won_message = new Colliding_Text("You won!!");
+        Entity* game_won_message = game_won_message = new Game_Ending_Colliding_Text("You won!!");
         game_won_message->addChild(new Subtext("Press r to restart"));
 
         rapidxml::xml_document<> doc;

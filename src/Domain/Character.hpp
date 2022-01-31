@@ -83,7 +83,7 @@ struct RotatingRect : public MovingEntity{
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
         MovingEntity::act(keyStatus, deltaTime);
-        if(is_paused) return;
+        if(is_paused || game_ended) return;
 
         if(is_jumping){
             this->transform.eulerRotation.z = this->jumping_rotation;
@@ -114,6 +114,10 @@ struct Braco : public MovingEntity{
     }
     
     virtual void act(int* keyStatus, GLdouble deltaTime){
+
+        MovingEntity::act(keyStatus, deltaTime);
+
+        if(is_paused || game_ended) return;
         
         if(this->player_braco) this->target_position = {keyStatus[MOUSE_X_COORD], keyStatus[MOUSE_Y_COORD]};
         else this->target_position = {keyStatus[PLAYER_X_COORD], keyStatus[PLAYER_Y_COORD]};
@@ -413,7 +417,7 @@ struct Character : public MovingEntity{
     virtual void act(int* keyStatus, GLdouble deltaTime){
         MovingEntity::act(keyStatus,  deltaTime);
 
-        if(is_paused) return;
+        if(is_paused || game_ended) return;
 
         this->shot_cooldown -= deltaTime;
     }
@@ -492,6 +496,8 @@ struct Player : public Character{
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
         Character::act(keyStatus, deltaTime);
+
+        if(is_paused || game_ended) return;
 
         if (keyStatus[(int)('a')]){
             this->x_moveConfigurations.velocity = -velocity;
@@ -681,7 +687,7 @@ struct Enemy : public Character{
             this->can_shot = !this->can_shot;
         }
 
-        if(is_paused || !this->can_move) return;
+        if(is_paused || game_ended || !this->can_move) return;
 
         #if defined TEST
             //std::cout << this->getNome() << " pode se mover entre: " << this->x_moveConfigurations.max << " e " << this->x_moveConfigurations.min << std::endl;

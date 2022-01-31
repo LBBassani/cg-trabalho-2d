@@ -91,6 +91,8 @@ struct Camera : public MovingEntity{
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
 
+        if(this->game_ended) return;
+
         MovingEntity::act(keyStatus, deltaTime);
 
         if(is_paused) return;

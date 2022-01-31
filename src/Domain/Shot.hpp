@@ -33,12 +33,13 @@ struct Shot : public MovingEntity{
     virtual void act(int* keyStatus, GLdouble deltaTime){
         MovingEntity::act(keyStatus, deltaTime);
 
+        if(is_paused || game_ended) return;
+
         this->move(deltaTime);
     }
 
     virtual void move(GLdouble deltaTime){
 
-        if(is_paused) return;
         glm::vec3 original_position = this->transform.position;
         this->hitbox_offset.x = this->shape_offset.x += x_moveConfigurations.velocity*deltaTime;
         this->transform.position = original_position;

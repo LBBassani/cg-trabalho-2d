@@ -22,6 +22,7 @@ struct Entity : public Model
     bool is_character = false;
     bool is_player = false; 
     bool is_trigger = false;
+    bool game_ended = false;
     MoveLiberty moveLiberty;
 
     Transform transform;
@@ -83,6 +84,12 @@ struct Entity : public Model
         for(auto child : children){
             child->draw();
         }
+    }
+
+    virtual void set_game_ended(bool game_ended){
+        this->game_ended = game_ended;
+        for(auto child : children)
+            child->set_game_ended(game_ended);
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime) { /* does nothing, implemented in movingEntities classes */};
