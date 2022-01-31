@@ -10,11 +10,14 @@
 #include "../Domain/Character.hpp"
 #include "../Domain/Camera.hpp"
 #include "../Domain/Text.hpp"
+#include "../Domain/Mouse.hpp"
 #include "../Third-Party-Libs/rapidxml-1.13/rapidxml.hpp"
 
 struct ParserSVG{
 
     static Entity* parseSVG(std::string &svgFileName) {
+
+        Mouse* mouse = new Mouse();
 
         Camera* scene_root = new Camera();
         scene_root->setNome("Camera");
@@ -133,6 +136,8 @@ struct ParserSVG{
 
                     game_won_message->hitbox = new Rect(r, std::numeric_limits<float>::max());
                     game_won_message->hitbox_offset.x -= r;
+
+                    mouse->setShape(new Triangle(r*0.25, r*0.25));
                     
                 } else{
                     character = new Enemy(r*2);
@@ -154,6 +159,7 @@ struct ParserSVG{
         }
 
         background->addChild(game_won_message);
+        scene_root->addChild(mouse);
         scene_root->addChild(background);
 
         // Configura zoom da tela

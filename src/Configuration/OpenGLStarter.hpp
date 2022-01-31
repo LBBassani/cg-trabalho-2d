@@ -10,60 +10,9 @@
 #include "OpenGLConfig.hpp"
 #include "ScenarioConfig.hpp"
 #include "../Domain/SceneTree.hpp"
-#include "../Domain/Shape.hpp"
-#include "../Domain/Text.hpp"
+#include "../Domain/Utils.hpp"
+#include "../Domain/Mouse.hpp"
 
-#define NUM_TECLAS_ASCII 256
-#define LEFT_CLICK 256
-#define RIGHT_CLICK 257
-#define MOUSE_X_COORD 258
-#define MOUSE_Y_COORD 259
-#define PLAYER_X_COORD 260
-#define PLAYER_Y_COORD 261
-
-struct Mouse : public Entity{
-    bool must_draw = true;
-    int must_draw_cooldown = 500;
-    glm::vec3 color_on_left_click = {0.2f, 1.0f, 0.2f};
-    glm::vec3 color_on_right_click = {1.0f, 0.0f, 0.5f};
-    glm::vec3 normal_color = {1.0f, 1.0f, 1.0f};
-
-    Mouse(){
-        this->setNome("Mouse");
-        this->setColor(this->normal_color);
-        this->setShape(new Triangle(1.0f, 1.0f));
-        this->transform.eulerRotation.z = 45.0f;
-        this->is_movable = true;
-    }
-
-    virtual void draw(){ if (must_draw) Entity::draw(); } // Desenha se puder ser desenhado
-
-    virtual void update_position_on_world(int x, int y){
-        glm::vec4 position_on_world = glm::inverse(parent->transform.modelMatrix)*glm::vec4(x, y, 0.0f, 1.0f);
-        this->transform.position.x = position_on_world.x;
-        this->transform.position.y = position_on_world.y;
-    }
-
-    virtual void act(int* keyStatus, GLdouble deltaTime){
-        must_draw_cooldown -= deltaTime;
-        if(keyStatus[(int) ('m')] && must_draw_cooldown <= 0){ 
-            must_draw_cooldown = 500;
-            must_draw = !must_draw;
-            std::string message = must_draw ? "Mouse is showing" : "Mouse is not showing";
-            
-            #if defined TEST
-                //std::cout << message << std::endl;
-            #endif
-
-            Left_Corner_Timed_Minitext::change_left_corner_text(message);
-        }
-        
-        if(keyStatus[LEFT_CLICK]) this->setColor(color_on_left_click);
-        else if(keyStatus[RIGHT_CLICK]) this->setColor(color_on_right_click);
-        else this->setColor(normal_color);
-        
-    }
-};
 
 struct OpenGLStarter{
     GLdouble framerate = 0;
@@ -83,8 +32,9 @@ struct OpenGLStarter{
     virtual void makeWorld(){
         this->sceneTree.cleanSceneTree();
         this->sceneTree.root = ParserSVG::parseSVG(this->sceneName);
-        this->mouse = new Mouse();
-        this->sceneTree.root->addChild(this->mouse);
+        this->mouse = dynamic_cast<Mouse*>(*this->sceneTree.root->children.begin());
+        this->sceneTree.root->removeChild(this->mouse);
+        this->sceneTree.root->addChild(this->mouse); // Passa o mouse pra prioridade de desenho
         this->sceneTree.root->updateSelfAndChildren();
         this->sceneTree.updateHitboxMapping();
 
@@ -142,15 +92,15 @@ struct OpenGLStarter{
 
     static void mouseClick(int button, int state, int, int){
         if(button == GLUT_LEFT_BUTTON){
-            if(state == GLUT_DOWN) instance->keyStatus[LEFT_CLICK] = 1; // On press
-            else instance->keyStatus[LEFT_CLICK] = 0;                   // On release
+            if(state == GLUT_DOWN) instance->keyStatus[MOUSE_LEFT_CLICK] = 1; // On press
+            else instance->keyStatus[MOUSE_LEFT_CLICK] = 0;                   // On release
         } else if(button == GLUT_RIGHT_BUTTON){
-            if(state == GLUT_DOWN) instance->keyStatus[RIGHT_CLICK] = 1;  // On press
-            else instance->keyStatus[RIGHT_CLICK] = 0;                  // On release
+            if(state == GLUT_DOWN) instance->keyStatus[MOUSE_RIGHT_CLICK] = 1;  // On press
+            else instance->keyStatus[MOUSE_RIGHT_CLICK] = 0;                  // On release
         }
         #if defined TEST
-            //if(instance->keyStatus[LEFT_CLICK]) std::cout << "Clique esquerdo!!" << std::endl;
-            //if(instance->keyStatus[RIGHT_CLICK]) std::cout << "Clique direito!!" << std::endl;
+            //if(instance->keyStatus[MOUSE_LEFT_CLICK]) std::cout << "Clique esquerdo!!" << std::endl;
+            //if(instance->keyStatus[MOUSE_RIGHT_CLICK]) std::cout << "Clique direito!!" << std::endl;
         #endif
     }
 
