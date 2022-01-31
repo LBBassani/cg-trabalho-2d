@@ -23,6 +23,7 @@
 
 struct Mouse : public Entity{
     bool must_draw = true;
+    int must_draw_cooldown = 500;
     glm::vec3 color_on_left_click = {0.2f, 1.0f, 0.2f};
     glm::vec3 color_on_right_click = {1.0f, 0.0f, 0.5f};
     glm::vec3 normal_color = {1.0f, 1.0f, 1.0f};
@@ -43,8 +44,12 @@ struct Mouse : public Entity{
         this->transform.position.y = position_on_world.y;
     }
 
-    virtual void act(int* keyStatus, GLdouble){
-        if(keyStatus[(int) ('m')]) must_draw = !must_draw;
+    virtual void act(int* keyStatus, GLdouble deltaTime){
+        must_draw_cooldown -= deltaTime;
+        if(keyStatus[(int) ('m')] && must_draw_cooldown <= 0){ 
+            must_draw_cooldown = 500;
+            must_draw = !must_draw;
+        }
         
         if(keyStatus[LEFT_CLICK]) this->setColor(color_on_left_click);
         else if(keyStatus[RIGHT_CLICK]) this->setColor(color_on_right_click);

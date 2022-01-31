@@ -21,6 +21,7 @@ struct MoveConfigurations{
 struct MovingEntity : public Entity{
 
     bool is_paused = false;
+    int is_paused_cooldown = 500;
     float velocity = 0.0f;
     MoveConfigurations x_moveConfigurations;
     MoveConfigurations y_moveConfigurations;
@@ -38,7 +39,12 @@ struct MovingEntity : public Entity{
 
         Entity::act(keyStatus, deltaTime);
 
-        if(keyStatus[(int) 'p']) this->is_paused = !this->is_paused;
+        is_paused_cooldown -= deltaTime;
+
+        if(keyStatus[(int) 'p'] && is_paused_cooldown <= 0) {
+            is_paused_cooldown = 500;
+            this->is_paused = !this->is_paused;
+        }
     }
 
     /*
