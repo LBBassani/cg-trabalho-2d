@@ -8,4 +8,4 @@ all:
 	g++ -o ../target/trabalho *.cpp -lGL -lGLU -lglut
 
 run: ../target/trabalho
-	../target/trabalho
+	../target/trabalho $(ARGS)
