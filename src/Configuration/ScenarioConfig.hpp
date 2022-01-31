@@ -169,10 +169,35 @@ struct ParserSVG{
             std::cout << zoom_factor << std::endl;
         #endif
 
+        // Textos no menu
+        scene_root->menu = new Text("Paused");
+        Subtext* sub_1 = new Subtext(" ");
+        scene_root->menu->addChild(sub_1);
+        
+        Subtext* sub_2 = new Subtext("r -> restart");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        
+        sub_2 = new Subtext("m -> show mouse");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        
+        sub_2 = new Subtext("c -> enemies will move");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        
+        sub_2 = new Subtext("z -> enemies will shoot");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        
+        sub_2 = new Subtext("f -> enable free camera control");
+        sub_1->addChild(sub_2);
+        sub_1 = sub_2;
+        scene_root->menu->set_can_show(true);
+
         // Textos no inicio
         #if !defined TEST
             Cascading_Timed_Text* t_1 = new Cascading_Timed_Text("Hello", 2000);
-            scene_root->addChild(t_1);
             Cascading_Timed_Text* t_2 = new Cascading_Timed_Text(" ", 500);
             t_1->addChild(t_2);
 
@@ -224,6 +249,7 @@ struct ParserSVG{
             t_2->addChild(t_4);
 
             t_1->set_can_show(true);
+            scene_root->intro = t_1;
         #endif
             
         return scene_root;

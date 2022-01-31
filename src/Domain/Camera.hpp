@@ -14,6 +14,7 @@ struct Camera : public MovingEntity{
     bool is_there_a_player_to_follow = false;
     int auto_key_cooldown = 500;
     Text* menu;
+    Text* intro;
 
     Camera(float velocity = 0.5f){
         this->velocity = velocity;
@@ -24,26 +25,10 @@ struct Camera : public MovingEntity{
         this->y_moveConfigurations.max = std::numeric_limits<float>::max();
         this->y_moveConfigurations.min = -std::numeric_limits<float>::max();
 
-        this->menu = new Text("Paused");
-        Subtext* sub_1 = new Subtext(" ");
-        this->menu->addChild(sub_1);
-        Subtext* sub_2 = new Subtext("r -> restart");
-        sub_1->addChild(sub_2);
-        sub_1 = sub_2;
-        sub_2 = new Subtext("m -> show mouse");
-        sub_1->addChild(sub_2);
-        sub_1 = sub_2;
-        sub_2 = new Subtext("c -> enemies will move");
-        sub_1->addChild(sub_2);
-        sub_1 = sub_2;
-        sub_2 = new Subtext("z -> enemies will shoot");
-        sub_1->addChild(sub_2);
-        sub_1 = sub_2;
-        sub_2 = new Subtext("f -> enable free camera control");
-        sub_1->addChild(sub_2);
-        sub_1 = sub_2;
-        this->menu->set_can_show(true);
+    }
 
+    ~Camera(){
+        delete this->intro;
     }
 
     virtual void print(){
@@ -86,6 +71,8 @@ struct Camera : public MovingEntity{
         
         if(is_paused){
             this->show_menu();
+        }else{
+            this->intro->draw();
         }
     }
 
@@ -96,6 +83,8 @@ struct Camera : public MovingEntity{
         MovingEntity::act(keyStatus, deltaTime);
 
         if(is_paused) return;
+
+        this->intro->idle(keyStatus, deltaTime);
 
         auto_key_cooldown -= deltaTime;
 
