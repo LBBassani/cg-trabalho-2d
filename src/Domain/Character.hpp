@@ -130,8 +130,19 @@ struct Braco : public MovingEntity{
             (this->transform.eulerRotation.z < 90.0f && direita)
             || (this->transform.eulerRotation.z > 90.0f && !direita)
         ) return;
+
         float angle_to_rotate = 2*(90 - this->transform.eulerRotation.z);
-        this->transform.eulerRotation.z += angle_to_rotate;
+        this->transform.eulerRotation.z += angle_to_rotate;        
+
+        if(direita){ 
+            this->max_angle = 45.0f;
+            this->min_angle = -45.0f;
+            this->shape_offset.y = 0.0f;
+        }else{
+            this->max_angle = 225.0f;
+            this->min_angle = 135.0f;
+            this->shape_offset.y = -height;
+        }
     }
 
     virtual void move(GLdouble deltaTime){
@@ -140,17 +151,27 @@ struct Braco : public MovingEntity{
         glm::vec4   braco_origem = {this->transform.position.x, this->transform.position.y + height/2, 0.0f, 1.0f},
                     target = {target_position.x, target_position.y, 0.0f, 1.0f};
         
-        braco_origem = this->transform.modelMatrix*braco_origem;
+        if(this->player_braco) braco_origem = this->transform.modelMatrix*braco_origem;
+        else braco_origem = glm::vec4(this->parent->transform.position.x, this->parent->transform.position.y, 0.0f, 1.0f);
+
+        #if defined TEST
+            if(this->parent->getNome() == "Player") std::cout << "(" << braco_origem.x << ", " << braco_origem.y << ") (" << target.x << ", " << target.y << ")" << std::endl;
+        #endif
+
+        if(braco_origem.x < target.x) this->flip(true);
+        else this->flip(false);
         
         float   angle_1 = atan2(target.y - braco_origem.y, target.x - braco_origem.x)*180/glm::pi<float>(),
                 angle_2 = this->transform.eulerRotation.z,
                 target_angle = angle_1 - angle_2;
+        if(this->min_angle == 135.0f && target_angle < -180) target_angle += 360;
+
         int signal = target_angle >= 0 ? 1 : -1;
         float new_angle = this->transform.eulerRotation.z + signal*angular_moveConfigurations.velocity*deltaTime;
 
         #if defined TEST
             //std::cout << "Angulo calculado: " << angle_2 << ", Angulo real: " << this->transform.eulerRotation.z << std::endl;
-            //std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
+            if(this->parent->getNome() == "Player") std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
         #endif
 
         this->transform.eulerRotation.z = std::min(this->max_angle, std::max(new_angle, min_angle));
@@ -453,8 +474,8 @@ struct Character : public MovingEntity{
 
         this->shot->transform.eulerRotation.z = this->braco->transform.eulerRotation.z;
         this->shot->transform.position.x = this->transform.position.x;
-        this->shot->shape_offset = {this->braco->width + this->braco->height, this->braco->height};
-        this->shot->hitbox_offset = {this->braco->width - this->braco->height, this->braco->height};
+        this->shot->shape_offset = {this->braco->width + this->braco->height, this->braco->height + this->braco->shape_offset.y};
+        this->shot->hitbox_offset = {this->braco->width - this->braco->height, this->braco->height + this->braco->shape_offset.y};
         this->shot->transform.position.y = this->transform.position.y;
         this->shot->x_moveConfigurations.velocity = 2*this->velocity;
         this->parent->addChild(this->shot);
@@ -532,10 +553,10 @@ struct Player : public Character{
 
         this->move(deltaTime);
 
-        glm::vec4 real_player_coords = this->transform.modelMatrix*glm::vec4(this->transform.position.x,this->transform.position.y, 0.0f, 1.0f);
+        glm::vec4 real_player_coords = /* this->transform.modelMatrix* */glm::vec4(this->transform.position.x,this->transform.position.y, 0.0f, 1.0f);
         
         keyStatus[PLAYER_X_COORD] = (int) real_player_coords.x;
-        keyStatus[PLAYER_Y_COORD] = (int) -real_player_coords.y;
+        keyStatus[PLAYER_Y_COORD] = (int) real_player_coords.y;
 
         #if defined TEST
             //std::cout << "Player no ponto: " << keyStatus[PLAYER_X_COORD] << ", " << keyStatus[PLAYER_Y_COORD] << std::endl;
