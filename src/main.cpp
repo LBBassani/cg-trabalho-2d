@@ -6,6 +6,7 @@
 #include <cmath>
 #include <string>
 #include <stdexcept>
+#include <fstream>
 
 #include "Configuration/OpenGLConfig.hpp"
 #include "Configuration/OpenGLStarter.hpp"
@@ -25,7 +26,11 @@ int main(int argc, char *argv[]){
         else throw std::runtime_error(std::string("Not enought arguments: expected .svg file to create level"));
     #endif
 
-    std::cout << arquivo << std::endl;
+    {
+        std::ifstream file(arquivo);
+        if(!file.good()) throw std::runtime_error(std::string("File not found: ") + arquivo);
+        file.close();
+    }
 
     OpenGLConfig openGLConfig = OpenGLConfig("Trabalho 2D",700, 700, 500, 500);
     OpenGLStarter openGLStarter = OpenGLStarter(openGLConfig, arquivo);
