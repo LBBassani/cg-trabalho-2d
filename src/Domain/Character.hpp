@@ -489,30 +489,12 @@ struct Player : public Character{
     Player(float height = Character::original_height) : Character(height) {
         this->is_player = true;
         this->braco->player_braco = true;
-        this->velocity = 0.02f;
-        this->x_moveConfigurations.max = 1000.0f;
-        this->y_moveConfigurations.max = 500.0f;
+        this->velocity = 0.002f*height;
+        this->x_moveConfigurations.max = std::numeric_limits<float>::max();
+        this->y_moveConfigurations.max = std::numeric_limits<float>::max();
         
-        this->x_moveConfigurations.min = -1000.0f;
-        this->y_moveConfigurations.min = 500.0f;
-    }
-
-    virtual void move(GLdouble deltaTime){
-        Character::move(deltaTime);
-
-        // Anima as perninhas
-
-        // Se mudar de direção, muda o braço de direção
-        //if(this->x_moveConfigurations.velocity > 0.0f){
-        //    this->braco->transform.position.x = this->braco->width/2;
-        //    this->braco->transform.eulerRotation.z = 180.f;
-        //    this->braco->transform.position.y = this->braco->height;
-        //} else if (this->x_moveConfigurations.velocity < 0.0f){
-        //    this->braco->transform.position.x = -this->braco->width/2;
-        //    this->braco->transform.eulerRotation.z = 0.0f;
-        //    this->braco->transform.position.y = 0.0f;
-        //}
-        
+        this->x_moveConfigurations.min = -std::numeric_limits<float>::max();
+        this->y_moveConfigurations.min = -std::numeric_limits<float>::max();
     }
 
     virtual void act(int* keyStatus, GLdouble deltaTime){
@@ -575,12 +557,13 @@ struct Enemy : public Character{
     int n = 1;
 
     Enemy(float height = Character::original_height, int original_move_cooldown = 3000) : Character(height){
-        this->velocity = 0.015f;
+        this->velocity = 0.0015f*height;
         this->x_moveConfigurations.velocity = this->velocity;
-        this->y_moveConfigurations.velocity = -0.01f;
+        this->y_moveConfigurations.velocity = -height*0.001f;
         
-        this->x_moveConfigurations.max = 5000;
-        this->x_moveConfigurations.min = -5000;
+        this->x_moveConfigurations.max = std::numeric_limits<float>::max();
+        this->x_moveConfigurations.min = -std::numeric_limits<float>::max();
+
 
         this->move_cooldown = this->original_move_cooldown_value = original_move_cooldown;
         #if defined TEST

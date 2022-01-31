@@ -13,9 +13,9 @@ struct Enemy;
 struct Shot : public MovingEntity{
 
     Shot(float r) : MovingEntity(){
-        this->x_moveConfigurations.velocity = 0.03f;
-        this->x_moveConfigurations.max = 1000.0f;
-        this->x_moveConfigurations.min = -1000.0f;
+        this->x_moveConfigurations.velocity = r*0.03f;
+        this->x_moveConfigurations.max = std::numeric_limits<float>::max();
+        this->x_moveConfigurations.min = -std::numeric_limits<float>::max();
 
         this->y_moveConfigurations.velocity = 0.0f;
         this->shape = new Circ(r);
