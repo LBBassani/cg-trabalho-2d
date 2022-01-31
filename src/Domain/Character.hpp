@@ -52,6 +52,7 @@ struct RotatingRect : public MovingEntity{
 
     virtual void reset(){
         this->transform.eulerRotation.z = this->original_rotation;
+        this->angular_moveConfigurations.velocity = velocity;
         for(auto entity : children){
             if(RotatingRect* child = dynamic_cast<RotatingRect*>(entity)){
                 child->reset();
@@ -257,7 +258,7 @@ struct Character : public MovingEntity{
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
-        RotatingRect* canela_dir = new RotatingRect();
+        RotatingRect* canela_dir = new RotatingRect(-0.1f);
         canela_dir->setNome("canela direita");
         canela_dir->setShape(perna_shape);
         canela_dir->setColor(config.perna_color);
@@ -265,7 +266,6 @@ struct Character : public MovingEntity{
         canela_dir->jumping_rotation = -70.0f;
         canela_dir->angular_moveConfigurations.max = 0.0f;
         canela_dir->angular_moveConfigurations.min = -60.0f;
-        canela_dir->angular_moveConfigurations.velocity = -canela_dir->angular_moveConfigurations.velocity/2;
         
         coxa_dir->addChild(canela_dir);
 
@@ -275,7 +275,7 @@ struct Character : public MovingEntity{
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
         
-        RotatingRect* coxa_esq = perna_2 = new RotatingRect();
+        RotatingRect* coxa_esq = perna_2 = new RotatingRect(-0.2f);
         coxa_esq->setNome("coxa esquerda");
         coxa_esq->setShape(perna_shape);
         coxa_esq->setColor(config.perna_color);
@@ -284,18 +284,16 @@ struct Character : public MovingEntity{
         coxa_esq->jumping_rotation = 190.0f;
         coxa_esq->angular_moveConfigurations.max = 240.0f;
         coxa_esq->angular_moveConfigurations.min = 120.0f;
-        coxa_esq->angular_moveConfigurations.velocity = -coxa_esq->angular_moveConfigurations.velocity;
 
         perna_shape = new Rect(height*config.braco_height, height*config.meia_perna);
 
-        RotatingRect* canela_esq = new RotatingRect();
+        RotatingRect* canela_esq = new RotatingRect(0.1f);
         canela_esq->setNome("canela esquerda");
         canela_esq->setShape(perna_shape);
         canela_esq->setColor(config.perna_color);
         canela_esq->transform.position.y = height*config.meia_perna;
         canela_esq->angular_moveConfigurations.max = 0.0f;
         canela_esq->angular_moveConfigurations.min = -60.0f;
-        canela_dir->angular_moveConfigurations.velocity = canela_dir->angular_moveConfigurations.velocity/2;
 
         coxa_esq->addChild(canela_esq);
 
