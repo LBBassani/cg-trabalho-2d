@@ -155,7 +155,7 @@ struct Braco : public MovingEntity{
         else braco_origem = glm::vec4(this->parent->transform.position.x, this->parent->transform.position.y, 0.0f, 1.0f);
 
         #if defined TEST
-            if(this->parent->getNome() == "Player") std::cout << "(" << braco_origem.x << ", " << braco_origem.y << ") (" << target.x << ", " << target.y << ")" << std::endl;
+            //if(this->parent->getNome() == "Player") std::cout << "(" << braco_origem.x << ", " << braco_origem.y << ") (" << target.x << ", " << target.y << ")" << std::endl;
         #endif
 
         if(braco_origem.x < target.x) this->flip(true);
@@ -736,6 +736,10 @@ struct Enemy : public Character{
             //std::cout << this->getNome() << " vai se mover para: " << this->transform.position.x << std::endl;
         #endif
 
+        glm::vec4   braco_origem = {this->transform.position.x, this->transform.position.y, 0.0f, 1.0f},
+                    target = {keyStatus[PLAYER_X_COORD], keyStatus[PLAYER_Y_COORD], 0.0f, 1.0f};
+
+        if( abs(this->transform.position.x - keyStatus[PLAYER_X_COORD]) >= height*3 ) return;
 
         if(!( (int) deltaTime % 5 ) && shot_cooldown <= 0 && can_shot) this->do_shot(deltaTime);
 
