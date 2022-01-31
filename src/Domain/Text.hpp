@@ -93,14 +93,16 @@ struct Colliding_Text : public Text{
     }
 
     virtual void do_collision(std::list<HitboxMapping> colliding_hitbox) {
-        HitboxMapping hitbox = *colliding_hitbox.begin();
         
-        #if defined TEST
-            // std::cout << hitbox.entity_ptr->getNome() <<" colidiu com texto!" << std::endl;
-        #endif
+        for(auto hitbox : colliding_hitbox){
 
-        if(hitbox.entity_ptr->is_player) {
-            this->set_can_show(true);
+            #if defined TEST
+                //std::cout << hitbox.entity_ptr->getNome() <<" colidiu com texto!" << std::endl;
+            #endif
+
+            if(hitbox.entity_ptr->is_player) {
+                this->set_can_show(true);
+            }
         }
     }
 

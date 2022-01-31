@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
     std::string arquivo;
 
     #if defined TEST
-        arquivo = "../scenario/arena_teste.svg";
+        arquivo = "../scenario/arena_teste_3.svg";
     #else
         if(argc >= 2) arquivo = argv[1];
         else throw std::runtime_error(std::string("Not enought arguments: expected .svg file to create level"));

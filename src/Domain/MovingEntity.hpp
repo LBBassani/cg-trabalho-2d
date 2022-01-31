@@ -100,6 +100,15 @@ struct MovingEntity : public Entity{
                 this->transform.eulerRotation.z = new_angular_rotation;
 
     }
+    
+    #if defined TEST
+        virtual void draw(){
+            Entity::draw();
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTranslatef(hitbox_offset.x, hitbox_offset.y, 0.0f);
+            if (hitbox) hitbox->draw();
+        }
+    #endif
 
 };
 

@@ -77,6 +77,16 @@ struct Entity : public Model
     }
 
     virtual void draw(){
+
+        #if defined TEST
+            if(this->is_trigger){
+                //std::cout << this->getNome() << " é um trigger" << std::endl;
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glTranslatef(hitbox_offset.x, hitbox_offset.y, 0.0f);
+                if (hitbox) hitbox->draw();
+            } 
+        #endif
+
         if(!prepare_drawing()) return;        
 
         Model::draw();

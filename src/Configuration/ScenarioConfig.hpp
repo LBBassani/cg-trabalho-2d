@@ -86,34 +86,33 @@ struct ParserSVG{
                     parede->setNome("Limite lateral esquerdo");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(1.0f, height), glm::vec2(-width/2, 0.0f));
+                    parede->setHitbox(new Rect(width, height), glm::vec2(-width, 0.0f));
                     background->addChild(parede);
 
                     parede = new Entity();
                     parede->setNome("Limite lateral direito");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(1.0f, height), glm::vec2(width/2, 0.0f));
+                    parede->setHitbox(new Rect(width, height), glm::vec2(width, 0.0f));
                     background->addChild(parede);
 
                     parede = new Entity();
                     parede->setNome("Limite superior");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, height));
+                    parede->setHitbox(new Rect(width, height), glm::vec2(0.0f, height));
                     background->addChild(parede);
 
                     parede = new Entity();
                     parede->setNome("Limite inferior");
                     parede->transform.position.x = newBackgroundModel->transform.position.x;
                     parede->transform.position.y = newBackgroundModel->transform.position.y;
-                    parede->setHitbox(new Rect(width, 1.0f), glm::vec2(0.0f, -1.0f));
+                    parede->setHitbox(new Rect(width, height), glm::vec2(0.0f, -height));
                     background->addChild(parede);
 
                     game_won_message->transform.position.x = newBackgroundModel->transform.position.x;
                     game_won_message->transform.position.y = newBackgroundModel->transform.position.y;
-                    game_won_message->setHitbox(new Rect(10.0f, 10.0f), glm::vec2(width/2 - 10.0f, 0.0f));
-
+                    game_won_message->hitbox_offset = glm::vec2(width/2, -height);
                 }
                 
                 background->addChild(newBackgroundModel);
@@ -131,6 +130,9 @@ struct ParserSVG{
                     character->setNome("Player");
                     scene_root->setPlayer(player);
                     background->transform.position.x = -(x - x_0 + r/2);
+
+                    game_won_message->hitbox = new Rect(r, std::numeric_limits<float>::max());
+                    game_won_message->hitbox_offset.x -= r;
                     
                 } else{
                     character = new Enemy(r*2);
@@ -143,7 +145,7 @@ struct ParserSVG{
                 character->transform.position.x = x - x_0 + r/2;
                 character->transform.position.y = -y - y_0;
 
-                character->y_moveConfigurations.min = character->transform.position.y - r*2;
+                //character->y_moveConfigurations.min = character->transform.position.y - r*2;
                 character->y_moveConfigurations.max = character->transform.position.y + r*6; // Pula 3x a própria altura
  
                 background->addChild(character);

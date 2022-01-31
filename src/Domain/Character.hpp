@@ -171,7 +171,7 @@ struct Braco : public MovingEntity{
 
         #if defined TEST
             //std::cout << "Angulo calculado: " << angle_2 << ", Angulo real: " << this->transform.eulerRotation.z << std::endl;
-            if(this->parent->getNome() == "Player") std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
+            //if(this->parent->getNome() == "Player") std::cout << "Braço no angulo " << this->transform.eulerRotation.z << " precisa rodar " << std::min(this->max_angle, std::max(new_angle, min_angle)) << " pra tentar alcançar " << target_angle << std::endl; 
         #endif
 
         this->transform.eulerRotation.z = std::min(this->max_angle, std::max(new_angle, min_angle));
@@ -309,7 +309,7 @@ struct Character : public MovingEntity{
     virtual void create_boundaries(){
         if (!parent) return;
 
-        float width = height*config.tronco_width, boundary_size = 1;
+        float width = height*config.tronco_width, boundary_size = height*config.tronco_width/5;
 
 
         boundaries.dist_direito.x = width/2 + boundary_size/2;
@@ -560,10 +560,8 @@ struct Enemy : public Character{
         this->velocity = 0.0015f*height;
         this->x_moveConfigurations.velocity = this->velocity;
         this->y_moveConfigurations.velocity = -height*0.001f;
-        
-        this->x_moveConfigurations.max = std::numeric_limits<float>::max();
-        this->x_moveConfigurations.min = -std::numeric_limits<float>::max();
 
+        this->y_moveConfigurations.min = -std::numeric_limits<float>::max();
 
         this->move_cooldown = this->original_move_cooldown_value = original_move_cooldown;
         #if defined TEST
